@@ -1,0 +1,57 @@
+<.flash_group flash={@flash} />
+<div class="flex flex-1 justify-center">
+  <div class="layout-content-container flex flex-col max-w-5xl flex-1">
+    <div
+      class="hero min-h-[50dvh]"
+      style="background-image: url(https://cdn.usegalileo.ai/sdxl10/c0eec962-8d9c-4ec3-b77a-c3681f6fbb62.png);">
+      <div class="hero-overlay bg-opacity-70"></div>
+      <div class="hero-content text-neutral-content text-center">
+        <div class="max-w-md">
+          <h1 class="mb-5 text-4xl font-bold text-white drop-shadow-lg">Connect with makers from around the world</h1>
+          <%= if !@current_user do %>
+            <div class="pt-8 font-bold text-white">
+              <.link
+                href={~p"/users/register"}
+                class="btn btn-lg btn-primary me-5"
+              >
+                Join
+              </.link>
+              or
+              <.link
+                href={~p"/users/log_in"}
+                class="btn btn-lg btn-accent ms-5"
+              >
+                Log in
+              </.link>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    <h2 class="text-[#1C1D22] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Recently Active Makers</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <%= for profile <- @latest_profiles do %>
+        <.link href={~p"/profiles/#{profile.id}"} class="block hover:drop-shadow-lg hover:-mt-0.5 hover:-ms-0.5 active:-mb-0.5 active:-me-0.5 active:mt-0.5 active:ms-0.5">
+          <div class="flex gap-4 bg-[#FFFFFF] px-4 py-3 drop-shadow rounded-md">
+            <div class="avatar flex items-center justify-center">
+              <%= if profile.profile_image_location do %>
+                <div class="w-16 rounded-full shadow-2xl">
+                  <img src={profile.profile_image_location} alt="#{profile.name}'s profile image" />
+                </div>
+              <% else %>
+                <div class="w-16 h-16 bg-indigo-100 mx-auto rounded-full shadow-2xl flex items-center justify-center text-indigo-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-14 w-14 mx-auto" viewBox="0 0 20 20" fill="currentColor"> 
+                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                  </svg>
+                </div>
+              <% end %>              
+            </div>
+            <div class="flex flex-1 flex-col justify-center gap-2">
+              <p class="text-[#1C1D22] text-lg font-medium leading-normal"><%= profile.name %></p>
+            </div>
+          </div>
+        </.link>
+      <% end %>
+    </div>
+  </div>
+</div>
