@@ -1,0 +1,46 @@
+<div
+  class="relative flex size-full min-h-screen flex-col bg-slate-50 justify-between group/design-root overflow-x-hidden"
+  style='font-family: "Plus Jakarta Sans", "Noto Sans", sans-serif;'
+>
+  <div>
+    <div>
+      <div class="flex items-center bg-slate-50 p-4 pb-2 justify-between">
+        <div class="text-[#0d151c] text-2xl">
+          My Profile
+        </div>
+        <div class="flex items-center justify-end">
+          <%= if @current_user && @profile.user.id == @current_user.id do %>
+            <.link patch={~p"/profiles/#{@profile}/edit-profile"} phx-click={JS.push_focus()}>
+              <.button>Edit Profile</.button>
+            </.link>
+          <% end %>
+        </div>
+      </div>
+      <div :if={@live_action != :edit_profile} class="flex p-4 @container" id="profile-details">
+        <div class="flex w-full flex-col gap-4 items-center">
+          <div class="flex gap-4 flex-col items-center">
+            <.avatar profile={@profile} size={36} />
+            <div class="">
+              <p class="text-[#0d151c] text-3xl font-bold leading-tight tracking-[-0.015em]"><%= @profile.name %></p>
+            </div>
+            <div>
+              <p class="text-[#0d151c] text-center font-normal leading-normal pb-3 pt-1 px-4">
+                  <%= @profile.bio %>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div :if={@live_action == :edit_profile}>
+        <.live_component
+          module={MakerPassportWeb.ProfileLive.ProfileFormComponent}
+          id={@profile.id}
+          title={@page_title}
+          action={@live_action}
+          profile={@profile}
+          patch={~p"/profiles/#{@profile}"}
+        />
+      </div>
+    </div>
+  </div>
+</div>

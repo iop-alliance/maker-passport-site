@@ -2,7 +2,7 @@ defmodule MakerPassport.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
 
-  # alias MakerPassport.Maker.Profile
+  alias MakerPassport.Maker.Profile
 
   schema "users" do
     field :email, :string
@@ -10,6 +10,8 @@ defmodule MakerPassport.Accounts.User do
     field :hashed_password, :string, redact: true
     field :current_password, :string, virtual: true, redact: true
     field :confirmed_at, :utc_datetime
+
+    has_one :profile, Profile
 
     timestamps(type: :utc_datetime)
   end
@@ -42,7 +44,7 @@ defmodule MakerPassport.Accounts.User do
     |> cast(attrs, [:email, :password])
     |> validate_email(opts)
     |> validate_password(opts)
-    # |> cast_assoc(:profile, required: false)  # Allow profile to be cast
+    |> cast_assoc(:profile)
   end
 
   defp validate_email(changeset, opts) do

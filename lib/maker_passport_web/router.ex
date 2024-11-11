@@ -20,7 +20,7 @@ defmodule MakerPassportWeb.Router do
   scope "/", MakerPassportWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    live "/", HomeLive.Index, :index
   end
 
   # Other scopes may use custom stacks.
@@ -69,22 +69,15 @@ defmodule MakerPassportWeb.Router do
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
 
-      # live "/profiles", ProfileLive.Index, :index
+      live "/profiles", ProfileLive.Index, :index
       # live "/profiles/new", ProfileLive.Index, :new
 
       # live "/profiles/me", ProfileLive.MyProfile
       # live "/profiles/me/edit", ProfileLive.MyProfile, :edit
-      # live "/profiles/:id", ProfileLive.Show, :show
-      # live "/profiles/:id/edit-profile", ProfileLive.Show, :edit_profile
+      live "/profiles/:id", ProfileLive.Show, :show
+      live "/profiles/:id/edit-profile", ProfileLive.Show, :edit_profile
       # live "/profiles/:id/edit", ProfileLive.Index, :edit
       # live "/profiles/:id/show/edit", ProfileLive.Show, :edit
-
-      # live "/skills", SkillLive.Index, :index
-      # live "/skills/new", SkillLive.Index, :new
-      # live "/skills/:id/edit", SkillLive.Index, :edit
-
-      # live "/skills/:id", SkillLive.Show, :show
-      # live "/skills/:id/show/edit", SkillLive.Show, :edit
     end
   end
 

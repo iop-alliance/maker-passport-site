@@ -1,0 +1,61 @@
+<div>
+    <.simple_form
+        for={@form}
+        id="profile-form"
+        phx-target={@myself}
+        phx-change="validate"
+        phx-submit="save"
+    >
+        <.input field={@form[:name]} type="text" label="Name" />
+        <.input field={@form[:bio]} type="textarea" label="Bio" />
+
+        <div class="flex gap-3">
+          <%= unless @profile.profile_image_location == nil || @profile.profile_image_location == "" do %>
+            <div class="avatar flex items-center justify-center">
+              <div class="w-24 rounded-full shadow-2xl">
+                <img src={@profile.profile_image_location} alt="#{@profile.name}'s profile image" />
+              </div>
+            </div>
+          <% end %>
+          <div>
+            <div phx-drop-target={@uploads.profile_image.ref} class="border border-dashed border-slate-400 rounded p-4">
+              <.live_file_input upload={@uploads.profile_image} class="file-input file-input-bordered w-full max-w-sm mr-1" />
+              <p class="text-center">or drag and drop here</p>
+            </div>
+            <div class="mt-1">
+              Max file size <%= trunc(@uploads.profile_image.max_file_size / 1_000_000) %> MB
+            </div>
+          </div>
+        </div>
+
+        <.error :for={err <- upload_errors(@uploads.profile_image)}>
+          <%= Phoenix.Naming.humanize(err) %>
+        </.error>
+
+        <div :for={entry <- @uploads.profile_image.entries}>
+          <div class="flex flex-nowrap items-center gap-4 h-36">
+            <div class="flex-none avatar">
+              <div class="w-36">
+                <.live_img_preview class="rounded w-36" entry={entry} />
+              </div>
+            </div>
+            <div class="flex-none w-14">
+            <%= entry.progress %>%
+            </div>
+            <div class="flex-1">
+            <progress class="progress progress-primary" value={"#{entry.progress}%"} max="100"></progress>
+            </div>
+            <div class="flex-none w-14">
+              <button phx-click="cancel" phx-value-ref={entry.ref} class="btn btn-sm btn-circle btn-ghost">✕</button>
+            </div>
+          </div>
+          <.error :for={err <- upload_errors(@uploads.profile_image, entry)}>
+            <%= Phoenix.Naming.humanize(err) %>
+          </.error>
+        </div>
+
+        <:actions>
+            <.button phx-disable-with="Saving...">Save Profile</.button>
+        </:actions>
+    </.simple_form>
+</div>
