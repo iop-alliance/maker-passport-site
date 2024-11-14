@@ -7,6 +7,7 @@ defmodule MakerPassport.Accounts do
   import Ecto.Changeset
 
   alias MakerPassport.Repo
+  alias MakerPassport.Maker.Profile
 
   alias MakerPassport.Accounts.{User, UserToken, UserNotifier}
 
@@ -233,8 +234,9 @@ defmodule MakerPassport.Accounts do
   """
   def get_user_by_session_token(token) do
     {:ok, query} = UserToken.verify_session_token_query(token)
-    Repo.one(query)
-    |> Repo.preload(:profile)
+    user = Repo.one(query) |> Repo.preload(:profile)
+
+    Map.put(user, :profile_complete, Profile.profile_complete?(user))
   end
 
   @doc """

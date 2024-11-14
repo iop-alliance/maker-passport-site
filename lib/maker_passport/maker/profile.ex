@@ -22,4 +22,13 @@ defmodule MakerPassport.Maker.Profile do
     # |> foreign_key_constraint(:user_id)
     # |> unique_constraint(:user_id)
   end
+
+  def profile_complete?(%User{profile: profile}) when not is_nil(profile) do
+    # Add all required profile fields here
+    not is_nil(profile.name) and
+      not is_nil(profile.bio) and
+      not is_nil(profile.profile_image_location)
+      # Add other required fields
+  end
+  def profile_complete?(_user), do: false
 end

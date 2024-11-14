@@ -52,11 +52,11 @@ defmodule MakerPassportWeb.Router do
 
     live_session :redirect_if_user_is_authenticated,
         on_mount: [{MakerPassportWeb.UserAuth, :redirect_if_user_is_authenticated}] do
-        live "/users/register", UserRegistrationLive, :new
-        live "/users/log_in", UserLoginLive, :new
-        live "/users/reset_password", UserForgotPasswordLive, :new
-        live "/users/reset_password/:token", UserResetPasswordLive, :edit
-      end
+      live "/users/register", UserRegistrationLive, :new
+      live "/users/log_in", UserLoginLive, :new
+      live "/users/reset_password", UserForgotPasswordLive, :new
+      live "/users/reset_password/:token", UserResetPasswordLive, :edit
+    end
 
     post "/users/log_in", UserSessionController, :create
   end
@@ -65,7 +65,7 @@ defmodule MakerPassportWeb.Router do
     pipe_through [:browser, :require_authenticated_user]
 
     live_session :require_authenticated_user,
-      on_mount: [{MakerPassportWeb.UserAuth, :ensure_authenticated}] do
+        on_mount: [{MakerPassportWeb.UserAuth, :ensure_authenticated}] do
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
 
