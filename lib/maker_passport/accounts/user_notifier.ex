@@ -8,7 +8,7 @@ defmodule MakerPassport.Accounts.UserNotifier do
     email =
       new()
       |> to(recipient)
-      |> from({"Maker Passport", "contact@example.com"})
+      |> from({"IOP: Maker Passport", "no-reply@internetofproduction.org"})
       |> subject(subject)
       |> text_body(body)
 
