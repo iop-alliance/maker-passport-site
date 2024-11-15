@@ -1,5 +1,5 @@
 defmodule MakerPassport.Accounts.UserNotifier do
-  @moduledoc """
+  @moduledoc false
   import Swoosh.Email
 
   alias MakerPassport.Mailer
@@ -22,20 +22,22 @@ defmodule MakerPassport.Accounts.UserNotifier do
   Deliver instructions to confirm account.
   """
   def deliver_confirmation_instructions(user, url) do
-    deliver(user.email, "Confirmation instructions", """
+    deliver(user.email,
+      "Maker Passport account confirmation instructions",
+      """
 
-    ==============================
+      ==============================
 
-    Hi #{user.email},
+      Hi #{user.email},
 
-    You can confirm your account by visiting the URL below:
+      You can confirm your account by visiting the URL below:
 
-    #{url}
+      #{url}
 
-    If you didn't create an account with us, please ignore this.
+      If you didn't create an account with us, please ignore this.
 
-    ==============================
-    """)
+      ==============================
+      """)
   end
 
   @doc """
