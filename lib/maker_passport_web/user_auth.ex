@@ -1,4 +1,8 @@
 defmodule MakerPassportWeb.UserAuth do
+  @moduledoc """
+  Provides authentication for the application.
+  """
+
   use MakerPassportWeb, :verified_routes
 
   import Plug.Conn

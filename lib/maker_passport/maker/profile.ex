@@ -1,4 +1,8 @@
 defmodule MakerPassport.Maker.Profile do
+  @moduledoc """
+  A Maker's profile.
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
 

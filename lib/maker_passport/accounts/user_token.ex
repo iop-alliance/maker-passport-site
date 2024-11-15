@@ -1,4 +1,8 @@
 defmodule MakerPassport.Accounts.UserToken do
+  @moduledoc """
+  A user token.
+  """
+
   use Ecto.Schema
   import Ecto.Query
   alias MakerPassport.Accounts.UserToken

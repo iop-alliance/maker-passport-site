@@ -1,5 +1,9 @@
 defmodule MakerPassportWeb.CustomComponents do
-  use Phoenix.Component
+  @moduledoc """
+  Custom components for the application.
+  """
+
+use Phoenix.Component
 
   alias MakerPassport.Maker.Profile
 

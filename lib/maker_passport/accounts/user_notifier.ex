@@ -1,4 +1,5 @@
 defmodule MakerPassport.Accounts.UserNotifier do
+  @moduledoc """
   import Swoosh.Email
 
   alias MakerPassport.Mailer

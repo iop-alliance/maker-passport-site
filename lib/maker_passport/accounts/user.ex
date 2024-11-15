@@ -1,4 +1,8 @@
 defmodule MakerPassport.Accounts.User do
+  @moduledoc """
+  A user of the application.
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
 
