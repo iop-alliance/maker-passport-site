@@ -12,6 +12,7 @@
         <div class="flex items-center justify-between">
           <h1 class="text-gray-600 font-medium text-lg text-center"><%= profile.name %></h1>
         </div>
+        <%= profile.skills |> Enum.take(3) |> Enum.map(&(&1.name)) |> Enum.join(", ") %><%= if length(profile.skills) > 3 do %>, &hellip;<% end %>
       </div>
     </div>
   </div>

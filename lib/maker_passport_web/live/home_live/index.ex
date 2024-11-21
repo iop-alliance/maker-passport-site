@@ -6,10 +6,11 @@ defmodule MakerPassportWeb.HomeLive.Index do
   import Ecto.Query, warn: false
 
   alias MakerPassport.Maker
+  alias MakerPassport.Maker.Skill
 
   @impl true
   def mount(_params, _session, socket) do
-    latest_profiles = Maker.list_profiles(limit: 4, sort: %{sort_by: :updated_at, sort_order: :desc})
+    latest_profiles = Maker.list_profiles(limit: 4, sort: %{sort_by: :updated_at, sort_order: :desc}, preload: [:skills])
 
     socket =
       socket

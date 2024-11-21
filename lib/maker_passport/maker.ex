@@ -19,7 +19,7 @@ defmodule MakerPassport.Maker do
 
   """
   def list_profiles do
-    Repo.all(Profile)
+    Repo.all(Profile) |> Repo.preload(:skills)
   end
 
   def list_profiles(criteria) when is_list(criteria) do

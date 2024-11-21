@@ -48,6 +48,11 @@
             </div>
             <div class="flex flex-1 flex-col justify-center gap-2">
               <p class="text-[#1C1D22] text-lg font-medium leading-normal"><%= profile.name %></p>
+              <%= if profile.skills != [] do %>
+                <p class="text-[#3C3F4A] text-sm font-normal leading-normal">
+                  <%= profile.skills |> Enum.take(3) |> Enum.map(&(&1.name)) |> Enum.join(", ") %><%= if length(profile.skills) > 3 do %>, &hellip;<% end %>
+                </p>
+              <% end %>              
             </div>
           </div>
         </.link>
