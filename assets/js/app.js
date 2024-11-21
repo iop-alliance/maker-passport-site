@@ -22,12 +22,18 @@ import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
 import Uploaders from "./uploaders"
+import {Combobox, ComboboxOption} from "./combobox"
+
+let Hooks =  {}
+Hooks.Combobox = Combobox
+Hooks.ComboboxOption = ComboboxOption
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},
-  uploaders: Uploaders
+  uploaders: Uploaders,
+  hooks: Hooks
 })
 
 // Show progress bar on live navigation and form submits

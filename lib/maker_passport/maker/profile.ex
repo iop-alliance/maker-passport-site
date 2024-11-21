@@ -7,6 +7,7 @@ defmodule MakerPassport.Maker.Profile do
   import Ecto.Changeset
 
   alias MakerPassport.Accounts.User
+  alias MakerPassport.Maker.Skill
 
   schema "profiles" do
     field :bio, :string
@@ -14,6 +15,10 @@ defmodule MakerPassport.Maker.Profile do
     field :profile_image_location, :string, default: ""
 
     belongs_to :user, User
+
+    many_to_many :skills, Skill,
+    join_through: "profile_skills",
+    on_replace: :delete
 
     timestamps(type: :utc_datetime)
   end
@@ -35,4 +40,5 @@ defmodule MakerPassport.Maker.Profile do
       # Add other required fields
   end
   def profile_complete?(_user), do: false
+
 end

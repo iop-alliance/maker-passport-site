@@ -4,7 +4,6 @@ defmodule MakerPassport.Accounts do
   """
 
   import Ecto.Query, warn: false
-  import Ecto.Changeset
 
   alias MakerPassport.Repo
   alias MakerPassport.Maker.Profile
