@@ -9,23 +9,37 @@ defmodule MakerPassportWeb.ProfileLive.Show do
   alias MakerPassport.Maker.Skill
 
   @impl true
-  def mount(_params, _session, socket) do
-    user = socket.assigns.current_user
-    profile = Maker.get_profile_with_skills_by_user_id!(user.id)
+  def mount(_params, session, socket) do
+    {:ok, socket}
+  end
+
+  @impl true
+  def handle_params(%{"id" => id} = params, _, socket) do
+    profile = Maker.get_profile!(id)
     skills = ordered_skills(profile)
 
     socket =
       socket
-      |> assign(:user_id, user.id)
-      |> assign_new(:form, fn ->
-        to_form(Maker.change_profile(profile))
-      end)
-      |> assign_new(:skills_form, fn ->
-        to_form(Skill.changeset(%Skill{}))
-      end)
+      |> assign(:profile, profile)
       |> assign(:skills, skills)
-      |> assign(temporary_assigns: [skills: []])
-    {:ok, socket}
+      |> assign(:page_title, page_title(socket.assigns.live_action))
+
+    {:noreply, apply_action(socket, socket.assigns.live_action, params)}
+  end
+
+  defp apply_action(socket, :show, _params) do
+    socket
+  end
+
+  defp apply_action(socket, :edit_profile, _params) do
+    socket
+    |> assign_new(:form, fn ->
+      to_form(Maker.change_profile(socket.assigns.profile))
+    end)
+    |> assign_new(:skills_form, fn ->
+      to_form(Skill.changeset(%Skill{}))
+    end)
+    |> assign(:page_title, "Edit Profile")
   end
 
   defp ordered_skills(profile) do
@@ -37,17 +51,6 @@ defmodule MakerPassportWeb.ProfileLive.Show do
     socket =
       socket
       |> push_event("set-input-value", %{id: "skills-picker", label: skill_name})
-    {:noreply, socket}
-  end
-
-  @impl true
-  def handle_params(%{"id" => id}, _, socket) do
-    profile = Maker.get_profile!(id)
-
-    socket =
-      socket
-      |> assign(:page_title, page_title(socket.assigns.live_action))
-      |> assign(:profile, profile)
     {:noreply, socket}
   end
 

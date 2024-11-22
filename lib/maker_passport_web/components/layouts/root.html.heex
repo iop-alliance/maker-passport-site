@@ -91,6 +91,28 @@
                   </div>
                   <ul tabindex="0" class="dropdown-content menu bg-slate-50 rounded-box z-[1] w-52 p-2 shadow-lg border mt-1">
                     <li>
+                      <%= if !@current_user.profile_complete do %>
+                        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                          <div class="flex">
+                            <div class="flex-shrink-0">
+                              <!-- Heroicon name: mini/exclamation-triangle -->
+                              <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 6a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 6zm0 9a1 1 0 100-2 1 1 0 000 2z" />
+                              </svg>
+                            </div>
+                            <div class="ml-3">
+                              <p class="text-sm text-yellow-700">
+                                Your profile is incomplete. 
+                                <.link navigate={~p"/profiles/#{@current_user.profile.id}/edit-profile"} class="font-medium underline hover:text-yellow-600">
+                                  Complete your profile here
+                                </.link>
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      <% end %>
+                    </li>
+                    <li>
                       <.link
                         href={~p"/profiles/#{@current_user.profile.id}"}
                         class="text-[#1C1D22] text-sm font-medium leading-normal hover:text-zinc-700"
