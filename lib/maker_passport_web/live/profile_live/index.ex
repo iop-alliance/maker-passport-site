@@ -1,6 +1,8 @@
 defmodule MakerPassportWeb.ProfileLive.Index do
   use MakerPassportWeb, :live_view
 
+  on_mount {MakerPassportWeb.UserAuth, :mount_current_user}
+
   alias MakerPassport.Maker
   alias MakerPassport.Maker.Profile
 
@@ -8,7 +10,15 @@ defmodule MakerPassportWeb.ProfileLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, stream(socket, :profiles, Maker.list_profiles())}
+    profiles = 
+      case socket.assigns.current_user do
+        nil -> Maker.list_profiles()
+        user -> 
+          Maker.list_profiles()
+          |> Enum.reject(fn profile -> profile.user && profile.user.id == user.id end)
+      end
+
+    {:ok, stream(socket, :profiles, profiles)}
   end
 
   @impl true
