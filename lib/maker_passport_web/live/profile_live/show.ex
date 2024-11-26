@@ -51,6 +51,7 @@ defmodule MakerPassportWeb.ProfileLive.Show do
     socket =
       socket
       |> push_event("set-input-value", %{id: "skills-picker", label: skill_name})
+
     {:noreply, socket}
   end
 
@@ -66,7 +67,7 @@ defmodule MakerPassportWeb.ProfileLive.Show do
   end
 
   defp save_skill(socket, skill_name, profile) do
-    skill = check_or_create_skill(skill_name)
+    skill = skill_name |> String.trim() |> check_or_create_skill()
     add_or_update_skill(socket, skill, profile)
     assign(socket, :profile, profile)
     {:noreply, socket}
