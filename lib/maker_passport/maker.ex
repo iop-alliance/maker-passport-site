@@ -7,7 +7,7 @@ defmodule MakerPassport.Maker do
   alias MakerPassport.Accounts
   alias MakerPassport.Repo
 
-  alias MakerPassport.Maker.{Profile, Skill, ProfileSkill}
+  alias MakerPassport.Maker.{Profile, ProfileSkill, Skill, Website}
 
   @doc """
   Returns the list of profiles.
@@ -53,7 +53,12 @@ defmodule MakerPassport.Maker do
       ** (Ecto.NoResultsError)
 
   """
-  def get_profile!(id), do: Repo.get!(Profile, id) |> Repo.preload(:user) |> Repo.preload([:skills])
+  def get_profile!(id),
+    do:
+      Repo.get!(Profile, id)
+      |> Repo.preload(:user)
+      |> Repo.preload([:skills])
+      |> Repo.preload(:websites)
 
   def get_profile_by_user_id!(user_id) do
     user =
@@ -74,8 +79,6 @@ defmodule MakerPassport.Maker do
     |> Repo.preload(:user)
     |> Repo.preload([:skills])
   end
-
-
 
   @doc """
   Creates a profile.
@@ -142,7 +145,7 @@ defmodule MakerPassport.Maker do
     Profile.changeset(profile, attrs)
   end
 
-   @doc """
+  @doc """
   Returns the list of skills.
 
   ## Examples
@@ -279,6 +282,7 @@ defmodule MakerPassport.Maker do
     profile_skills = Repo.all(from ps in ProfileSkill, where: ps.profile_id == ^profile_id)
     skill_ids_to_exclude = Enum.map(profile_skills, & &1.skill_id)
     skills = Enum.reject(skills, &(&1.id in skill_ids_to_exclude))
+
     skills
     |> Enum.map(&to_skill_tuple/1)
     |> Enum.sort_by(&elem(&1, 0))
@@ -290,8 +294,102 @@ defmodule MakerPassport.Maker do
 
   def has_skill?(profile, skill_id) do
     # Check if the profile has the skill by querying the database
-    Repo.exists?(from s in ProfileSkill,
-      where: s.profile_id == ^profile.id and s.skill_id == ^skill_id
+    Repo.exists?(
+      from s in ProfileSkill,
+        where: s.profile_id == ^profile.id and s.skill_id == ^skill_id
     )
+  end
+
+  @doc """
+  Gets a single website.
+
+  Raises `Ecto.NoResultsError` if the Website does not exist.
+
+  ## Examples
+
+      iex> get_website!(123)
+      %Website{}
+
+      iex> get_website!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_website!(id), do: Repo.get!(Website, id)
+
+  @doc """
+  Creates a website,
+
+  ## Examples
+
+      iex> create_website(%{field: value})
+      {:ok, %Website{}}
+
+      iex> create_website(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_website(attrs \\ %{}) do
+    %Website{}
+    |> Website.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a website.
+
+  ## Examples
+
+      iex> update_website(website, %{field: new_value})
+      {:ok, %Website{}}
+
+      iex> update_website(website, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_website(%Website{} = website, attrs) do
+    website
+    |> Website.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a website.
+
+  ## Examples
+
+      iex> delete_website(website)
+      {:ok, %Website{}}
+
+      iex> delete_website(website)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_website(%Website{} = website) do
+    Repo.delete(website)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking website changes.
+
+  ## Examples
+
+      iex> change_website(website)
+      %Ecto.Changeset{data: %Website{}}
+
+  """
+  def change_website(%Website{} = website, attrs \\ %{}) do
+    Website.changeset(website, attrs)
+  end
+
+  def add_website(profile_id, website_params) do
+    website_params = Map.put(website_params, "profile_id", profile_id)
+    create_website(website_params)
+  end
+
+  def remove_website(%Profile{} = profile, website_id) do
+    profile_website =
+      Repo.get_by(ProfileWebsite, %{profile_id: profile.id, website_id: website_id})
+
+    Repo.delete(profile_website)
   end
 end

@@ -1,82 +1,188 @@
-<div
-  class="relative flex size-full flex-col bg-slate-50 justify-between group/design-root overflow-x-hidden"
-  style='font-family: "Plus Jakarta Sans", "Noto Sans", sans-serif;'
->
-  <div class="flex items-center bg-slate-50 pb-2 justify-between">
-    <%= if @current_user && @profile.user.id == @current_user.id do %>
-      <div class="text-[#0d151c] text-2xl">
-        My Profile
-        <.link :if={@live_action != :edit_profile} patch={~p"/profiles/#{@profile}/edit-profile"} phx-click={JS.push_focus()}>
-          <.icon name="hero-pencil-square" class="w-5 h-5 mb-3 hover:text-blue-600" />
-        </.link>
-      </div>
-    <% end %>
-  </div>
-  <div :if={@live_action != :edit_profile} class="flex p-4 @container" id="profile-details">
-    <div class="flex w-full flex-col gap-4 items-center">
-      <div class="flex gap-4 flex-col items-center">
+<div class="">
+  <%= if @current_user && @profile.user.id == @current_user.id do %>
+    <div class="text-[#0d151c] text-2xl">
+      My Profile
+      <.link
+        :if={@live_action != :edit_profile}
+        patch={~p"/profiles/#{@profile}/edit-profile"}
+        phx-click={JS.push_focus()}
+      >
+        <.icon name="hero-pencil-square" class="w-5 h-5 mb-3 hover:text-blue-600" />
+      </.link>
+    </div>
+  <% end %>
+</div>
+<div :if={@live_action != :edit_profile} class="py-4 @container" id="profile-details">
+  <div class="grid grid-cols-1 gap-8">
+    <div class="grid grid-cols-4 gap-8">
+      <div class="justify-self-end">
         <.avatar profile={@profile} size={36} />
-        <div class="">
-          <p class="text-[#0d151c] text-3xl font-bold leading-tight tracking-[-0.015em]"><%= @profile.name %></p>
+      </div>
+      <div class="col-span-3">
+        <p class="text-[#0d151c] text-3xl font-bold leading-tight tracking-[-0.015em]">
+          <%= @profile.name %>
+        </p>
+        <p class="text-[#0d151c] font-normal leading-normal pb-3 pt-2">
+          <%= @profile.bio %>
+        </p>
+      </div>
+    </div>
+    <%= if @skills != [] do %>
+      <div class="grid grid-cols-4 gap-8">
+        <div class="justify-self-end">
+          <h3 class="text-lg font-semibold pt-3 text-gray-800">Skills</h3>
         </div>
-        <div>
-          <p class="text-[#0d151c] text-center font-normal leading-normal pb-3 pt-1 px-4">
-              <%= @profile.bio %>
-          </p>
-        </div>
-        <div class="mt-4">
-          <h3 class="text-lg font-semibold mb-2">Skills</h3>
-          <div class="flex flex-wrap gap-2 justify-center">
-            <%= if @skills != [] do %>              
-              <div :for={skill <- @skills} id={"skill-#{skill.id}"} class="me-4 p-3 text-gray-700 bg-neutral/20 rounded-lg">
-                <%= skill.name %>
-              </div>
-            <% end %>
+        <div class="col-span-3 flex flex-wrap">
+          <div
+            :for={skill <- @skills}
+            id={"skill-#{skill.id}"}
+            class="me-4 p-3 text-gray-700 bg-neutral/20 rounded-lg"
+          >
+            <%= skill.name %>
           </div>
         </div>
       </div>
-    </div>
-  </div>
-  <div :if={@live_action == :edit_profile}>
-    <.live_component
-      module={MakerPassportWeb.ProfileLive.ProfileFormComponent}
-      id={@profile.id}
-      title={@page_title}
-      action={@live_action}
-      profile={@profile}
-      patch={~p"/profiles/#{@profile}"}
-    />
-
-    <hr class="h-1 bg-gray-100 border-0 rounded my-4 md:my-10 dark:bg-gray-300" />
-
-    <div>
-        <.simple_form
-        for={@skills_form}
-        id="skills-form"
-        phx-submit="save_skill"
-      >
-        <div id="skills-picker-container" class="mt-4 flex items-center">
-          <.typeahead
-            id="skills-picker"
-            class="w-full rounded-s-lg"
-            placeholder="Add a skill..."
-            on_search={fn search_text ->
-                Maker.search_skills(search_text)
-                |> Maker.to_skill_list(@profile.id)
-            end}
-            on_select={fn skill -> send(self(), {:typeahead, skill}) end}
-          />
-          <button phx-disable-with="Saving..." class="p-3 border-l-0 rounded-e-lg bg-primary text-primary-content font-semibold text-sm">Add Skill</button>
+    <% end %>
+    <%= if @profile.websites != [] do %>
+      <div class="grid grid-cols-4 gap-8">
+        <div class="justify-self-end">
+          <h3 class="text-lg font-semibold pt-3 text-gray-800">Websites</h3>
         </div>
-      </.simple_form>
-      <div id="skills-list" phx-update="append" class="mt-6 flex flex-wrap gap-2">
-        <div :for={skill <- @skills} id={"skill-#{skill.id}"} class="me-4 ps-3 pe-2 py-2 text-gray-700 bg-neutral/20 rounded-lg">
-          <%= skill.name %>
-            <span class="tooltip" data-tip="Remove skill" phx-click="remove-skill" phx-value-skill_id={skill.id}>
-              <.icon name="hero-x-circle" class="w-6 h-6 mb-1 hover:text-red-500 cursor-pointer" />
-            </span>
+        <div class="col-span-3">
+          <div
+            :for={website <- @profile.websites}
+            id={"website-#{website.id}"}
+            class="pt-3 text-blue-800 hover:text-blue-600 underline"
+          >
+            <a href={website.url} target="_blank" class="hover:text-blue-600">
+              <%= website.title %>
+            </a>
+          </div>
         </div>
       </div>
+    <% end %>
+  </div>
+</div>
+<div :if={@live_action == :edit_profile}>
+  <.live_component
+    module={MakerPassportWeb.ProfileLive.ProfileFormComponent}
+    id={@profile.id}
+    title={@page_title}
+    action={@live_action}
+    profile={@profile}
+    patch={~p"/profiles/#{@profile}"}
+  />
+
+  <hr class="h-1 bg-gray-100 border-0 rounded my-4 md:my-10 dark:bg-gray-300" />
+
+  <div>
+    <h3 class="text-lg font-semibold pt-3 text-gray-800">Skills</h3>
+    <.simple_form for={@skills_form} id="skills-form" phx-submit="save_skill">
+      <div id="skills-picker-container" class="flex items-center">
+        <.typeahead
+          id="skills-picker"
+          class="w-full rounded-s-lg"
+          placeholder="Add a skill..."
+          on_search={
+            fn search_text ->
+              Maker.search_skills(search_text)
+              |> Maker.to_skill_list(@profile.id)
+            end
+          }
+          on_select={fn skill -> send(self(), {:typeahead, skill}) end}
+        />
+        <button
+          phx-disable-with="Saving..."
+          class="p-3 border-l-0 rounded-e-lg bg-primary text-primary-content font-semibold text-sm"
+        >
+          Add Skill
+        </button>
+      </div>
+    </.simple_form>
+    <div id="skills-list" phx-update="append" class="mt-6 flex flex-wrap gap-2">
+      <div
+        :for={skill <- @skills}
+        id={"skill-#{skill.id}"}
+        class="me-4 ps-3 pe-2 py-2 text-gray-700 bg-neutral/20 rounded-lg"
+      >
+        <%= skill.name %>
+        <span
+          class="tooltip"
+          data-tip="Remove skill"
+          phx-click="remove-skill"
+          phx-value-skill_id={skill.id}
+        >
+          <.icon name="hero-x-circle" class="w-6 h-6 mb-1 hover:text-red-500 cursor-pointer" />
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <hr class="h-1 bg-gray-100 border-0 rounded my-4 md:my-10 dark:bg-gray-300" />
+
+  <div>
+    <h3 class="text-lg font-semibold pt-3 text-gray-800">Websites</h3>
+    <.simple_form
+      for={@website_form}
+      id="website-form"
+      phx-change="validate-website"
+      phx-submit="save-website"
+      class="form-control border-2 rounded-lg p-3"
+    >
+      <.input
+        field={@website_form[:title]}
+        type="text"
+        label="Title"
+        class="input input-bordered"
+      />
+      <.input field={@website_form[:url]} type="url" label="URL" class="input input-bordered" />
+
+      <button
+        phx-disable-with="Saving..."
+        class="p-3 border-l-0 rounded-lg bg-primary text-primary-content font-semibold text-sm"
+      >
+        Add Website
+      </button>
+    </.simple_form>
+
+    <div class="overflow-x-auto mt-4">
+      <table class="table text-gray-700">
+        <!-- head -->
+        <thead>
+          <tr class="text-lg font-semibold text-gray-700">
+            <th>Title</th>
+            <th>URL</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            :for={website <- @profile.websites}
+            id={"website-#{website.id}"}
+            class="hover:bg-gray-200 hover:text-gray-800"
+          >
+            <th><%= website.title %></th>
+            <td>
+              <a href={website.url} target="_blank" class="hover:text-blue-600">
+                <%= website.url %>
+              </a>
+            </td>
+            <td>
+              <span
+                class="tooltip"
+                data-tip="Remove website"
+                phx-click="remove-website"
+                phx-value-website_id={website.id}
+              >
+                <.icon
+                  name="hero-x-circle"
+                  class="w-6 h-6 mb-1 hover:text-red-500 cursor-pointer"
+                />
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </div>

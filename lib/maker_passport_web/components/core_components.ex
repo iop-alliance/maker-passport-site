@@ -202,7 +202,7 @@ defmodule MakerPassportWeb.CoreComponents do
   def simple_form(assigns) do
     ~H"""
     <.form :let={f} for={@for} as={@as} {@rest}>
-      <div class="mt-10 space-y-8">
+      <div class="space-y-4">
         <%= render_slot(@inner_block, f) %>
         <div :for={action <- @actions} class="mt-2 flex items-center justify-between gap-6">
           <%= render_slot(action, f) %>
@@ -318,10 +318,11 @@ defmodule MakerPassportWeb.CoreComponents do
           name={@name}
           value="true"
           checked={@checked}
-          class="checkbox" <> @class
-          {@rest}
-        />
-        <%= @label %>
+          class="checkbox"
+          <
+        /> @class
+        {@rest}
+        /> <%= @label %>
       </label>
       <.error :for={msg <- @errors}><%= msg %></.error>
     </div>
@@ -332,13 +333,11 @@ defmodule MakerPassportWeb.CoreComponents do
     ~H"""
     <div>
       <.label for={@id}><%= @label %></.label>
-      <select
-        id={@id}
-        name={@name}
-        class="select select-bordered w-full max-w-xs" <> @class
+      <select id={@id} name={@name} class="select select-bordered w-full max-w-xs" <>
+        @class
         multiple={@multiple}
         {@rest}
-      >
+        >
         <option :if={@prompt} value=""><%= @prompt %></option>
         <%= Phoenix.HTML.Form.options_for_select(@options, @value) %>
       </select>

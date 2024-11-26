@@ -4,12 +4,13 @@ defmodule MakerPassportWeb.ProfileLive.Show do
   import MakerPassportWeb.CustomComponents
   import MakerPassportWeb.ProfileLive.TypeaheadComponent, only: [typeahead: 1]
 
-  alias MakerPassport.Repo
   alias MakerPassport.Maker
-  alias MakerPassport.Maker.Skill
+  alias MakerPassport.Maker.{Skill, Website}
+  alias MakerPassport.Repo
+  alias Phoenix.LiveDashboard.Web
 
   @impl true
-  def mount(_params, session, socket) do
+  def mount(_params, _session, socket) do
     {:ok, socket}
   end
 
@@ -39,6 +40,9 @@ defmodule MakerPassportWeb.ProfileLive.Show do
     |> assign_new(:skills_form, fn ->
       to_form(Skill.changeset(%Skill{}))
     end)
+    |> assign_new(:website_form, fn ->
+      to_form(Website.changeset(%Website{}))
+    end)
     |> assign(:page_title, "Edit Profile")
   end
 
@@ -59,6 +63,18 @@ defmodule MakerPassportWeb.ProfileLive.Show do
   def handle_event("save_skill", %{"search-field" => skill_name}, socket) do
     save_skill(socket, skill_name, socket.assigns.profile)
     {:noreply, push_navigate(socket, to: ~p"/profiles/#{socket.assigns.profile.id}/edit-profile")}
+  end
+
+  @impl true
+  def handle_event("save-website", %{"website" => website_params}, socket) do
+    Maker.add_website(socket.assigns.profile.id, website_params)
+    {:noreply, push_navigate(socket, to: ~p"/profiles/#{socket.assigns.profile.id}/edit-profile")}
+  end
+
+  @impl true
+  def handle_event("validate-website", %{"website" => website_params}, socket) do
+    changeset = Website.changeset(%Website{}, website_params)
+    {:noreply, assign(socket, website_form: to_form(changeset, action: :validate))}
   end
 
   def handle_event("remove-skill", %{"skill_id" => skill_id}, socket) do
