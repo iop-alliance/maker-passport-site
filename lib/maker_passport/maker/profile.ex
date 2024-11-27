@@ -7,7 +7,7 @@ defmodule MakerPassport.Maker.Profile do
   import Ecto.Changeset
 
   alias MakerPassport.Accounts.User
-  alias MakerPassport.Maker.{Skill, Website}
+  alias MakerPassport.Maker.{Certification, Skill, Website}
 
   schema "profiles" do
     field :bio, :string
@@ -15,6 +15,7 @@ defmodule MakerPassport.Maker.Profile do
     field :profile_image_location, :string, default: ""
 
     belongs_to :user, User
+    has_many :certifications, Certification
     has_many :websites, Website
 
     many_to_many :skills, Skill,

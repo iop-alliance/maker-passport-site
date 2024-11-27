@@ -7,7 +7,7 @@ defmodule MakerPassport.Maker do
   alias MakerPassport.Accounts
   alias MakerPassport.Repo
 
-  alias MakerPassport.Maker.{Profile, ProfileSkill, Skill, Website}
+  alias MakerPassport.Maker.{Certification, Profile, ProfileSkill, Skill, Website}
 
   @doc """
   Returns the list of profiles.
@@ -58,6 +58,7 @@ defmodule MakerPassport.Maker do
       Repo.get!(Profile, id)
       |> Repo.preload(:user)
       |> Repo.preload([:skills])
+      |> Repo.preload(:certifications)
       |> Repo.preload(:websites)
 
   def get_profile_by_user_id!(user_id) do
@@ -368,6 +369,11 @@ defmodule MakerPassport.Maker do
     Repo.delete(website)
   end
 
+  def remove_website(website_id) do
+    website = get_website!(website_id)
+    Repo.delete(website)
+  end
+
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking website changes.
 
@@ -386,10 +392,78 @@ defmodule MakerPassport.Maker do
     create_website(website_params)
   end
 
-  def remove_website(%Profile{} = profile, website_id) do
-    profile_website =
-      Repo.get_by(ProfileWebsite, %{profile_id: profile.id, website_id: website_id})
+  @doc """
+  Gets a single certification.
 
-    Repo.delete(profile_website)
+  Raises `Ecto.NoResultsError` if the Certification does not exist.
+
+  ## Examples
+
+      iex> get_certification!(123)
+      %Certification{}
+
+      iex> get_certification!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_certification!(id), do: Repo.get!(Certification, id)
+
+  @doc """
+  Creates a certification,
+
+  ## Examples
+
+      iex> create_certification(%{field: value})
+      {:ok, %Certification{}}
+
+      iex> create_certification(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_certification(attrs \\ %{}) do
+    IO.inspect(attrs)
+
+    %Certification{}
+    |> Certification.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Deletes a certification.
+
+  ## Examples
+
+      iex> delete_certification(certification)
+      {:ok, %Certification{}}
+
+      iex> delete_certification(certification)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_certification(%Certification{} = certification) do
+    Repo.delete(certification)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking certification changes.
+
+  ## Examples
+
+      iex> change_certification(certification)
+      %Ecto.Changeset{data: %Certification{}}
+
+  """
+  def change_certification(%Certification{} = certification, attrs \\ %{}) do
+    Certification.changeset(certification, attrs)
+  end
+
+  def add_certification(profile_id, certification_params) do
+    certification_params = Map.put(certification_params, "profile_id", profile_id)
+    create_certification(certification_params)
+  end
+
+  def remove_certification(certification_id) do
+    certification = get_certification!(certification_id)
+    Repo.delete(certification)
   end
 end

@@ -5,9 +5,8 @@ defmodule MakerPassportWeb.ProfileLive.Show do
   import MakerPassportWeb.ProfileLive.TypeaheadComponent, only: [typeahead: 1]
 
   alias MakerPassport.Maker
-  alias MakerPassport.Maker.{Skill, Website}
+  alias MakerPassport.Maker.{Certification, Skill, Website}
   alias MakerPassport.Repo
-  alias Phoenix.LiveDashboard.Web
 
   @impl true
   def mount(_params, _session, socket) do
@@ -43,6 +42,9 @@ defmodule MakerPassportWeb.ProfileLive.Show do
     |> assign_new(:website_form, fn ->
       to_form(Website.changeset(%Website{}))
     end)
+    |> assign_new(:certification_form, fn ->
+      to_form(Certification.changeset(%Certification{}))
+    end)
     |> assign(:page_title, "Edit Profile")
   end
 
@@ -65,6 +67,11 @@ defmodule MakerPassportWeb.ProfileLive.Show do
     {:noreply, push_navigate(socket, to: ~p"/profiles/#{socket.assigns.profile.id}/edit-profile")}
   end
 
+  def handle_event("remove-skill", %{"skill_id" => skill_id}, socket) do
+    remove_skill(socket, String.to_integer(skill_id), socket.assigns.profile)
+    {:noreply, push_navigate(socket, to: ~p"/profiles/#{socket.assigns.profile.id}/edit-profile")}
+  end
+
   @impl true
   def handle_event("save-website", %{"website" => website_params}, socket) do
     Maker.add_website(socket.assigns.profile.id, website_params)
@@ -73,12 +80,29 @@ defmodule MakerPassportWeb.ProfileLive.Show do
 
   @impl true
   def handle_event("validate-website", %{"website" => website_params}, socket) do
-    changeset = Website.changeset(%Website{}, website_params)
+    changeset = Maker.change_website(%Website{}, website_params)
     {:noreply, assign(socket, website_form: to_form(changeset, action: :validate))}
   end
 
-  def handle_event("remove-skill", %{"skill_id" => skill_id}, socket) do
-    remove_skill(socket, String.to_integer(skill_id), socket.assigns.profile)
+  def handle_event("remove-website", %{"website_id" => website_id}, socket) do
+    remove_website(socket, String.to_integer(website_id))
+    {:noreply, push_navigate(socket, to: ~p"/profiles/#{socket.assigns.profile.id}/edit-profile")}
+  end
+
+  @impl true
+  def handle_event("save-certification", %{"certification" => certification_params}, socket) do
+    save_certification(socket, certification_params, socket.assigns.profile)
+    {:noreply, push_navigate(socket, to: ~p"/profiles/#{socket.assigns.profile.id}/edit-profile")}
+  end
+
+  @impl true
+  def handle_event("validate-certification", %{"certification" => certification_params}, socket) do
+    changeset = Maker.change_certification(%Certification{}, certification_params)
+    {:noreply, assign(socket, certification_form: to_form(changeset, action: :validate))}
+  end
+
+  def handle_event("remove-certification", %{"certification_id" => certification_id}, socket) do
+    remove_certification(socket, String.to_integer(certification_id))
     {:noreply, push_navigate(socket, to: ~p"/profiles/#{socket.assigns.profile.id}/edit-profile")}
   end
 
@@ -112,6 +136,21 @@ defmodule MakerPassportWeb.ProfileLive.Show do
 
   defp remove_skill(socket, skill_id, profile) do
     Maker.remove_skill(profile, skill_id)
+    socket
+  end
+
+  defp save_certification(socket, certification_params, profile) do
+    Maker.add_certification(profile.id, certification_params)
+    socket
+  end
+
+  defp remove_website(socket, website_id) do
+    Maker.remove_website(website_id)
+    socket
+  end
+
+  defp remove_certification(socket, certification_id) do
+    Maker.remove_certification(certification_id)
     socket
   end
 

@@ -43,6 +43,51 @@
         </div>
       </div>
     <% end %>
+    <%= if @profile.certifications != [] do %>
+      <div class="grid grid-cols-4 gap-8">
+        <div class="justify-self-end">
+          <h3 class="text-lg font-semibold pt-3 text-gray-800">Certifications</h3>
+        </div>
+        <div class="col-span-3">
+          <div
+            :for={certificate <- @profile.certifications}
+            id={"certificate-#{certificate.id}"}
+            class="pt-3"
+          >
+            <dl class="divide-y divide-slate-200 border border-gray-200 rounded-lg bg-slate-100 p-2">
+              <div class="px-4 py-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                <dt class="text-sm font-bold text-gray-900">Title</dt>
+                <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
+                  <%= certificate.title %>
+                </dd>
+              </div>
+              <div class="px-4 py-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                <dt class="text-sm font-bold text-gray-900">Issue Date</dt>
+                <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
+                  <%= certificate.issue_date %>
+                </dd>
+              </div>
+              <div class="px-4 py-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                <dt class="text-sm font-bold text-gray-900">Issuer</dt>
+                <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
+                  <%= certificate.issuer_name %>
+                </dd>
+              </div>
+              <%= if certificate.url != nil do %>
+                <div class="px-4 py-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                  <dt class="text-sm font-bold text-gray-900">URL</dt>
+                  <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
+                    <a href={certificate.url} target="_blank" class="hover:text-blue-600">
+                      <%= certificate.url %>
+                    </a>
+                  </dd>
+                </div>
+              <% end %>
+            </dl>
+          </div>
+        </div>
+      </div>
+    <% end %>
     <%= if @profile.websites != [] do %>
       <div class="grid grid-cols-4 gap-8">
         <div class="justify-self-end">
@@ -115,6 +160,95 @@
           <.icon name="hero-x-circle" class="w-6 h-6 mb-1 hover:text-red-500 cursor-pointer" />
         </span>
       </div>
+    </div>
+  </div>
+
+  <hr class="h-1 bg-gray-100 border-0 rounded my-4 md:my-10 dark:bg-gray-300" />
+
+  <div>
+    <h3 class="text-lg font-semibold pt-3 text-gray-800">Certifications</h3>
+    <.simple_form
+      for={@certification_form}
+      id="certification-form"
+      phx-change="validate-certification"
+      phx-submit="save-certification"
+      class="form-control border-2 rounded-lg p-3"
+    >
+      <.input
+        field={@certification_form[:title]}
+        type="text"
+        label="Title"
+        class="input input-bordered"
+      />
+      <.input
+        field={@certification_form[:issue_date]}
+        type="date"
+        label="Date"
+        class="input input-bordered"
+      />
+      <.input
+        field={@certification_form[:issuer_name]}
+        type="text"
+        label="Issuer"
+        class="input input-bordered"
+      />
+      <.input
+        field={@certification_form[:url]}
+        type="url"
+        label="URL"
+        class="input input-bordered"
+      />
+
+      <button
+        phx-disable-with="Saving..."
+        class="p-3 border-l-0 rounded-lg bg-primary text-primary-content font-semibold text-sm"
+      >
+        Add Certification
+      </button>
+    </.simple_form>
+
+    <div class="overflow-x-auto mt-4">
+      <table class="table text-gray-700">
+        <!-- head -->
+        <thead>
+          <tr class="text-lg font-semibold text-gray-700">
+            <th>Title</th>
+            <th>Issuer</th>
+            <th>Date</th>
+            <th>URL</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            :for={certification <- @profile.certifications}
+            id={"certification-#{certification.id}"}
+            class="hover:bg-gray-200 hover:text-gray-800"
+          >
+            <th><%= certification.title %></th>
+            <th><%= certification.issuer_name %></th>
+            <th><%= certification.issue_date %></th>
+            <td>
+              <a href={certification.url} target="_blank" class="hover:text-blue-600">
+                <%= certification.url %>
+              </a>
+            </td>
+            <td>
+              <span
+                class="tooltip"
+                data-tip="Remove certification"
+                phx-click="remove-certification"
+                phx-value-certification_id={certification.id}
+              >
+                <.icon
+                  name="hero-x-circle"
+                  class="w-6 h-6 mb-1 hover:text-red-500 cursor-pointer"
+                />
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 
