@@ -64,18 +64,18 @@ defmodule MakerPassportWeb.ProfileLive.Show do
   @impl true
   def handle_event("save_skill", %{"search-field" => skill_name}, socket) do
     save_skill(socket, skill_name, socket.assigns.profile)
-    {:noreply, push_navigate(socket, to: ~p"/profiles/#{socket.assigns.profile.id}/edit-profile")}
+    {:noreply, push_patch(socket, to: ~p"/profiles/#{socket.assigns.profile.id}/edit-profile")}
   end
 
   def handle_event("remove-skill", %{"skill_id" => skill_id}, socket) do
     remove_skill(socket, String.to_integer(skill_id), socket.assigns.profile)
-    {:noreply, push_navigate(socket, to: ~p"/profiles/#{socket.assigns.profile.id}/edit-profile")}
+    {:noreply, push_patch(socket, to: ~p"/profiles/#{socket.assigns.profile.id}/edit-profile")}
   end
 
   @impl true
   def handle_event("save-website", %{"website" => website_params}, socket) do
     Maker.add_website(socket.assigns.profile.id, website_params)
-    {:noreply, push_navigate(socket, to: ~p"/profiles/#{socket.assigns.profile.id}/edit-profile")}
+    {:noreply, push_patch(socket, to: ~p"/profiles/#{socket.assigns.profile.id}/edit-profile")}
   end
 
   @impl true
@@ -86,13 +86,13 @@ defmodule MakerPassportWeb.ProfileLive.Show do
 
   def handle_event("remove-website", %{"website_id" => website_id}, socket) do
     remove_website(socket, String.to_integer(website_id))
-    {:noreply, push_navigate(socket, to: ~p"/profiles/#{socket.assigns.profile.id}/edit-profile")}
+    {:noreply, push_patch(socket, to: ~p"/profiles/#{socket.assigns.profile.id}/edit-profile")}
   end
 
   @impl true
   def handle_event("save-certification", %{"certification" => certification_params}, socket) do
     save_certification(socket, certification_params, socket.assigns.profile)
-    {:noreply, push_navigate(socket, to: ~p"/profiles/#{socket.assigns.profile.id}/edit-profile")}
+    {:noreply, push_patch(socket, to: ~p"/profiles/#{socket.assigns.profile.id}/edit-profile")}
   end
 
   @impl true
@@ -103,7 +103,14 @@ defmodule MakerPassportWeb.ProfileLive.Show do
 
   def handle_event("remove-certification", %{"certification_id" => certification_id}, socket) do
     remove_certification(socket, String.to_integer(certification_id))
-    {:noreply, push_navigate(socket, to: ~p"/profiles/#{socket.assigns.profile.id}/edit-profile")}
+    {:noreply, push_patch(socket, to: ~p"/profiles/#{socket.assigns.profile.id}/edit-profile")}
+  end
+
+  def get_country_name(country_code) do
+    case Countries.get(country_code) do
+      nil -> "Unknown"
+      country -> country.name
+    end
   end
 
   defp save_skill(socket, skill_name, profile) do

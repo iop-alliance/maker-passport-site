@@ -91,6 +91,14 @@ defmodule MakerPassportWeb.ProfileLive.ProfileFormComponent do
     {:ok, metadata, socket}
   end
 
+  defp country_options do
+    Countries.all()
+    |> Enum.map(fn country ->
+      {country.name, country.alpha2}
+    end)
+    |> Enum.sort_by(fn {name, _code} -> name end)
+  end
+
   defp filename(entry) do
     "profile-images/#{entry.uuid}-#{entry.client_name}"
   end

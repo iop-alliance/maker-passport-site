@@ -12,6 +12,8 @@ defmodule MakerPassport.Maker.Profile do
   schema "profiles" do
     field :bio, :string
     field :name, :string
+    field :country, :string
+    field :city, :string
     field :profile_image_location, :string, default: ""
 
     belongs_to :user, User
@@ -28,7 +30,7 @@ defmodule MakerPassport.Maker.Profile do
   @doc false
   def changeset(profile, attrs) do
     profile
-    |> cast(attrs, [:name, :bio, :profile_image_location])
+    |> cast(attrs, [:name, :bio, :country, :city, :profile_image_location])
     |> validate_required([:name])
 
     # |> foreign_key_constraint(:user_id)
@@ -36,12 +38,8 @@ defmodule MakerPassport.Maker.Profile do
   end
 
   def profile_complete?(%User{profile: profile}) when not is_nil(profile) do
-    # Add all required profile fields here
-    not is_nil(profile.name) and
-      not is_nil(profile.bio) and
-      not is_nil(profile.profile_image_location)
-
-    # Add other required fields
+    required_fields = [:name, :bio, :profile_image_location, :country, :city]
+    Enum.all?(required_fields, &(not is_nil(Map.get(profile, &1))))
   end
 
   def profile_complete?(_user), do: false

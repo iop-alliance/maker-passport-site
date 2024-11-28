@@ -319,10 +319,9 @@ defmodule MakerPassportWeb.CoreComponents do
           value="true"
           checked={@checked}
           class="checkbox"
-          <
-        /> @class
-        {@rest}
-        /> <%= @label %>
+          {@rest}
+        />
+        <%= @label %>
       </label>
       <.error :for={msg <- @errors}><%= msg %></.error>
     </div>
