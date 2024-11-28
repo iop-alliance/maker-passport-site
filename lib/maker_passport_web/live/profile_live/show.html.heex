@@ -19,7 +19,7 @@
       <div class="justify-self-end">
         <.avatar profile={@profile} size={36} />
       </div>
-      <div class="col-span-3 mt-4">
+        <div class="col-span-3 mt-5 border border-gray-300 rounded-lg p-4">
         <h1 class="text-4xl font-bold text-gray-900 tracking-tight">
           <%= @profile.name %>
         </h1>
@@ -35,7 +35,7 @@
     <%= if @skills != [] do %>
       <div class="grid grid-cols-4 gap-8">
         <div class="justify-self-end">
-          <h2 class="text-xl font-semibold text-gray-900">Skills</h2>
+          <h2 class="text-xl pt-3 font-semibold text-gray-900">Skills</h2>
         </div>
         <div class="col-span-3 flex flex-wrap gap-2">
           <div
@@ -52,7 +52,7 @@
    <%= if @profile.certifications != [] do %>
       <div class="grid grid-cols-4 gap-8">
         <div class="justify-self-end">
-          <h3 class="text-lg font-semibold pt-3 text-gray-800">Certifications</h3>
+          <h3 class="text-lg font-semibold text-gray-800">Certifications</h3>
         </div>
         <div class="col-span-3">
           <div
@@ -60,7 +60,7 @@
             id={"certificate-#{certificate.id}"}
             class="mb-4 last:mb-0"
           >
-            <div class="bg-white shadow-sm border border-gray-200 rounded-lg overflow-hidden">
+            <div class="shadow-sm border border-gray-300 rounded-lg overflow-hidden">
               <div class="grid grid-cols-3 gap-x-4 gap-y-3 p-4">
                 <div class="text-sm font-medium text-gray-500">Title</div>
                 <div class="col-span-2 text-sm text-gray-900">
