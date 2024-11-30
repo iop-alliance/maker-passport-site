@@ -15,7 +15,7 @@ defmodule MakerPassportWeb.ProfileLive.Show do
 
   @impl true
   def handle_params(%{"id" => id} = params, _, socket) do
-    profile = Maker.get_profile!(id)
+    profile = Maker.get_profile!(id) |> Repo.preload(:location)
     skills = ordered_skills(profile)
 
     socket =
@@ -53,10 +53,10 @@ defmodule MakerPassportWeb.ProfileLive.Show do
   end
 
   @impl true
-  def handle_info({:typeahead, {skill_name, _}}, socket) do
+  def handle_info({:typeahead, {name, _}, id}, socket) do
     socket =
       socket
-      |> push_event("set-input-value", %{id: "skills-picker", label: skill_name})
+      |> push_event("set-input-value", %{id: id, label: name})
 
     {:noreply, socket}
   end

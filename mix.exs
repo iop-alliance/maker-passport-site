@@ -62,7 +62,8 @@ defmodule MakerPassport.MixProject do
       {:plug_crypto, "~> 1.0"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:bandit, "~> 1.5"},
-      {:countries, "~> 1.6"}
+      {:countries, "~> 1.6"},
+      {:live_select, "~> 1.0"}
     ]
   end
 

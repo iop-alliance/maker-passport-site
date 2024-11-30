@@ -5,27 +5,35 @@ defmodule MakerPassportWeb.ProfileLive.TypeaheadComponent do
   import MakerPassportWeb.CoreComponents
 
   attr :id, :string, default: "typeahead"
+  attr :name, :string, default: "search-field"
+  attr :value, :string, default: ""
   attr :label, :string, default: nil
   attr :class, :string, default: ""
   attr :rest, :global
   attr :on_select, :any, default: nil
   attr :on_search, :any, required: true
+  attr :disabled, :boolean, default: false
 
   def typeahead(assigns) do
     ~H"""
     <.live_component
       module={__MODULE__}
       id={@id}
+      name={@name}
+      value={@value}
       label={@label}
       rest={@rest}
       class={@class}
       on_select={@on_select}
       on_search={@on_search}
+      disabled={@disabled}
     />
     """
   end
 
   attr :id, :string
+  attr :name, :string
+  attr :value, :string
   attr :myself, :any
   attr :focused_option, :any
   attr :search_options, :list, default: []
@@ -67,9 +75,10 @@ defmodule MakerPassportWeb.ProfileLive.TypeaheadComponent do
         phx-target={@myself}>
         <input
           type="text"
-          name="search-field"
+          name={@name}
           id={@id}
           autocomplete="off"
+          value={@value}
           class={[
             "block text-grey-700 focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 phx-no-feedback:border-gray-300",
             "phx-no-feedback:focus:border-blue-500 phx-no-feedback:focus:ring-blue-500/5",
@@ -81,6 +90,7 @@ defmodule MakerPassportWeb.ProfileLive.TypeaheadComponent do
           phx-target={@myself}
           phx-hook="Combobox"
           {@rest}
+          disabled={@disabled}
         />
 
         <.dropdown_options

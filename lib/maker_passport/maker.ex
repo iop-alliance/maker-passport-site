@@ -7,7 +7,7 @@ defmodule MakerPassport.Maker do
   alias MakerPassport.Accounts
   alias MakerPassport.Repo
 
-  alias MakerPassport.Maker.{Certification, Profile, ProfileSkill, Skill, Website}
+  alias MakerPassport.Maker.{Certification, Profile, ProfileSkill, Skill, Website, Location}
 
   @doc """
   Returns the list of profiles.
@@ -144,6 +144,27 @@ defmodule MakerPassport.Maker do
   """
   def change_profile(%Profile{} = profile, attrs \\ %{}) do
     Profile.changeset(profile, attrs)
+  end
+
+  @doc """
+  Create %Location{} or get %Location{}.
+
+  ## Examples
+
+      iex> get_or_create_location("Uk", "London")
+      %Location{}
+
+  """
+  def get_or_create_location(country, city) do
+    case Repo.one(from l in Location, where: ilike(l.country, ^country) and ilike(l.city, ^city)) do
+      nil ->
+        %Location{country: country, city: city}
+        |> Location.changeset()
+        |> Repo.insert!()
+
+      location ->
+        location
+    end
   end
 
   @doc """
@@ -299,6 +320,30 @@ defmodule MakerPassport.Maker do
       from s in ProfileSkill,
         where: s.profile_id == ^profile.id and s.skill_id == ^skill_id
     )
+  end
+
+  def search_cities(""), do: []
+
+  def search_cities(search_text) do
+    Repo.all(from l in Location, where: ilike(l.city, ^"%#{search_text}%"))
+  end
+
+  def to_city_list(cities, nil) do
+    cities
+    |> Enum.map(&to_city_tuple/1)
+    |> Enum.sort_by(&elem(&1, 0))
+  end
+
+  def to_city_list(cities, location_id) do
+    cities = Enum.filter(cities, &(&1.id != location_id))
+
+    cities
+    |> Enum.map(&to_city_tuple/1)
+    |> Enum.sort_by(&elem(&1, 0))
+  end
+
+  defp to_city_tuple(location) do
+    {location.city, location.id}
   end
 
   @doc """

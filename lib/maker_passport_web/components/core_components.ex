@@ -318,7 +318,7 @@ defmodule MakerPassportWeb.CoreComponents do
           name={@name}
           value="true"
           checked={@checked}
-          class="checkbox"
+          class={["checkbox", @class]}
           {@rest}
         />
         <%= @label %>
