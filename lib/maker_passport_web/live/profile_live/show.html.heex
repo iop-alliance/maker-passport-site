@@ -26,7 +26,7 @@
         <div class="mt-4 space-y-2 text-gray-600">
           <p class="flex items-center gap-2">
             <.icon name="hero-map-pin" class="w-5 h-5" />
-            <%= @profile.location && get_country_name(@profile.location.country) <> " . " %>  <%= @profile.location.city %>
+            <%= @profile.location && get_country_name(@profile.location.country) <> " . "  <> @profile.location.city %>
           </p>
           <p class="leading-relaxed"><%= @profile.bio %></p>
         </div>
