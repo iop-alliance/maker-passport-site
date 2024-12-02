@@ -9,6 +9,8 @@ defmodule MakerPassport.Maker.Location do
   schema "locations" do
     field :country, :string
     field :city, :string
+    field :latitude, :float
+    field :longitude, :float
 
     timestamps(type: :utc_datetime)
   end
@@ -16,6 +18,6 @@ defmodule MakerPassport.Maker.Location do
   @doc false
   def changeset(location, attrs \\ %{}) do
     location
-    |> cast(attrs, [:country, :city])
+    |> cast(attrs, [:country, :city, :latitude, :longitude])
   end
 end

@@ -5,6 +5,8 @@ defmodule MakerPassport.Repo.Migrations.CreateLocations do
     create table(:locations) do
       add :country, :string
       add :city, :string
+      add :latitude, :float
+      add :longitude, :float
 
       timestamps(type: :utc_datetime)
     end
