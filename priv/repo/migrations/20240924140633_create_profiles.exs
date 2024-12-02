@@ -4,8 +4,6 @@ defmodule MakerPassport.Repo.Migrations.CreateProfiles do
   def change do
     create table(:profiles) do
       add :name, :string
-      add :country, :string
-      add :city, :string
       add :bio, :text
       add :profile_image_location, :string
 
