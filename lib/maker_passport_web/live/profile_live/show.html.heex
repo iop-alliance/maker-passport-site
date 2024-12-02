@@ -1,38 +1,43 @@
-<div class="">
+<div class="space-y-12">
   <%= if @current_user && @profile.user.id == @current_user.id do %>
-    <div class="text-[#0d151c] text-2xl">
+    <div class="text-[#0d151c] text-2xl flex items-center gap-2">
       My Profile
       <.link
         :if={@live_action != :edit_profile}
         patch={~p"/profiles/#{@profile}/edit-profile"}
         phx-click={JS.push_focus()}
       >
-        <.icon name="hero-pencil-square" class="w-5 h-5 mb-3 hover:text-blue-600" />
+        <.icon name="hero-pencil-square" class="w-5 h-5 hover:text-blue-600" />
       </.link>
     </div>
   <% end %>
 </div>
-<div :if={@live_action != :edit_profile} class="py-4 @container" id="profile-details">
-  <div class="grid grid-cols-1 gap-8">
+
+<div :if={@live_action != :edit_profile} class="py-8 @container max-w-5xl mx-auto" id="profile-details">
+  <div class="space-y-12">
     <div class="grid grid-cols-4 gap-8">
       <div class="justify-self-end">
         <.avatar profile={@profile} size={36} />
       </div>
-      <div class="col-span-3">
-        <p class="text-[#0d151c] text-3xl font-bold leading-tight tracking-[-0.015em]">
+        <div class="col-span-3 mt-5 border border-gray-300 rounded-lg p-4">
+        <h1 class="text-4xl font-bold text-gray-900 tracking-tight">
           <%= @profile.name %>
-        </p>
-        <p class="text-[#0d151c] font-normal leading-normal pb-3 pt-2">
-          <%= @profile.bio %>
-        </p>
+        </h1>
+        <div class="mt-4 space-y-2 text-gray-600">
+          <p class="flex items-center gap-2">
+            <.icon name="hero-map-pin" class="w-5 h-5" />
+            <%= @profile.location && get_country_name(@profile.location.country) <> " . "  <> @profile.location.city %>
+          </p>
+          <p class="leading-relaxed"><%= @profile.bio %></p>
+        </div>
       </div>
     </div>
     <%= if @skills != [] do %>
       <div class="grid grid-cols-4 gap-8">
         <div class="justify-self-end">
-          <h3 class="text-lg font-semibold pt-3 text-gray-800">Skills</h3>
+          <h2 class="text-xl pt-3 font-semibold text-gray-900">Skills</h2>
         </div>
-        <div class="col-span-3 flex flex-wrap">
+        <div class="col-span-3 flex flex-wrap gap-2">
           <div
             :for={skill <- @skills}
             id={"skill-#{skill.id}"}
@@ -43,47 +48,47 @@
         </div>
       </div>
     <% end %>
-    <%= if @profile.certifications != [] do %>
+
+   <%= if @profile.certifications != [] do %>
       <div class="grid grid-cols-4 gap-8">
         <div class="justify-self-end">
-          <h3 class="text-lg font-semibold pt-3 text-gray-800">Certifications</h3>
+          <h3 class="text-lg font-semibold text-gray-800">Certifications</h3>
         </div>
         <div class="col-span-3">
           <div
             :for={certificate <- @profile.certifications}
             id={"certificate-#{certificate.id}"}
-            class="pt-3"
+            class="mb-4 last:mb-0"
           >
-            <dl class="divide-y divide-slate-200 border border-gray-200 rounded-lg bg-slate-100 p-2">
-              <div class="px-4 py-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                <dt class="text-sm font-bold text-gray-900">Title</dt>
-                <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
+            <div class="shadow-sm border border-gray-300 rounded-lg overflow-hidden">
+              <div class="grid grid-cols-3 gap-x-4 gap-y-3 p-4">
+                <div class="text-sm font-medium text-gray-500">Title</div>
+                <div class="col-span-2 text-sm text-gray-900">
                   <%= certificate.title %>
-                </dd>
-              </div>
-              <div class="px-4 py-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                <dt class="text-sm font-bold text-gray-900">Issue Date</dt>
-                <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
-                  <%= certificate.issue_date %>
-                </dd>
-              </div>
-              <div class="px-4 py-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                <dt class="text-sm font-bold text-gray-900">Issuer</dt>
-                <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
+                </div>
+
+                <div class="text-sm font-medium text-gray-500">Issuer</div>
+                <div class="col-span-2 text-sm text-gray-900">
                   <%= certificate.issuer_name %>
-                </dd>
-              </div>
-              <%= if certificate.url != nil do %>
-                <div class="px-4 py-1 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                  <dt class="text-sm font-bold text-gray-900">URL</dt>
-                  <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
-                    <a href={certificate.url} target="_blank" class="hover:text-blue-600">
+                </div>
+
+                <div class="text-sm font-medium text-gray-500">Issue Date</div>
+                <div class="col-span-2 text-sm text-gray-900">
+                  <%= certificate.issue_date %>
+                </div>
+
+                <%= if certificate.url do %>
+                  <div class="text-sm font-medium text-gray-500">URL</div>
+                  <div class="col-span-2 text-sm text-gray-900">
+                    <a href={certificate.url} 
+                       target="_blank" 
+                       class="text-blue-600 hover:text-blue-800 hover:underline break-all">
                       <%= certificate.url %>
                     </a>
-                  </dd>
-                </div>
-              <% end %>
-            </dl>
+                  </div>
+                <% end %>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -91,15 +96,16 @@
     <%= if @profile.websites != [] do %>
       <div class="grid grid-cols-4 gap-8">
         <div class="justify-self-end">
-          <h3 class="text-lg font-semibold pt-3 text-gray-800">Websites</h3>
+          <h2 class="text-xl font-semibold text-gray-900">Websites</h2>
         </div>
-        <div class="col-span-3">
+        <div class="col-span-3 space-y-3">
           <div
             :for={website <- @profile.websites}
             id={"website-#{website.id}"}
-            class="pt-3 text-blue-800 hover:text-blue-600 underline"
+            class="flex items-center gap-2 text-gray-600 hover:text-blue-600 underline"
           >
-            <a href={website.url} target="_blank" class="hover:text-blue-600">
+            <.icon name="hero-globe-alt" class="w-5 h-5" />
+            <a href={website.url} target="_blank" class="hover:underline">
               <%= website.title %>
             </a>
           </div>
@@ -134,7 +140,7 @@
               |> Maker.to_skill_list(@profile.id)
             end
           }
-          on_select={fn skill -> send(self(), {:typeahead, skill}) end}
+          on_select={fn skill -> send(self(), {:typeahead, skill, "skills-picker"}) end}
         />
         <button
           phx-disable-with="Saving..."

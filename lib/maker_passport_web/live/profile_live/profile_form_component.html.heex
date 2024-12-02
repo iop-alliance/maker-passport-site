@@ -12,6 +12,36 @@
       label="Name"
       class="input input-bordered w-full max-w-xs"
     />
+    
+    <div>
+      <.label for="Country">Country</.label>
+      <.live_select 
+        field={@form[:country]} 
+        phx-target={@myself} 
+        allow_clear={true}
+        id="country_search" 
+        value={@form[:country].value || get_country_name(@profile.location)} 
+      />    
+    </div>
+    
+    <div>
+    <.label for="City">City</.label>
+    <.typeahead
+      id="cities-picker"
+      class="w-full rounded-s-lg"
+      value={@form[:city].value || (@profile.location && @profile.location.city)} 
+      name="profile[city]"
+      disabled={is_nil(@form[:country].value) || @form[:country].value == ""}
+        on_search={
+          fn search_text ->
+            Maker.search_cities(search_text)
+            |> Maker.to_city_list(@profile.location_id)
+          end
+        }
+        on_select={fn city -> send(self(), {:typeahead, city, "cities-picker"}) end}
+    />
+    </div>
+
     <.input
       field={@form[:bio]}
       type="textarea"

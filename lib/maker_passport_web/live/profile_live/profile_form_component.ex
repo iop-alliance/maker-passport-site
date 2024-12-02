@@ -2,6 +2,8 @@ defmodule MakerPassportWeb.ProfileLive.ProfileFormComponent do
   use MakerPassportWeb, :live_component
 
   alias MakerPassport.Maker
+  import MakerPassportWeb.ProfileLive.TypeaheadComponent, only: [typeahead: 1]
+  import LiveSelect
 
   @do_space "maker-profiles"
   @do_region "fra1"
@@ -23,7 +25,8 @@ defmodule MakerPassportWeb.ProfileLive.ProfileFormComponent do
      |> assign(assigns)
      |> assign_new(:form, fn ->
        to_form(Maker.change_profile(profile))
-     end)}
+     end)
+    }
   end
 
   @impl true
@@ -45,6 +48,7 @@ defmodule MakerPassportWeb.ProfileLive.ProfileFormComponent do
       case length(profile_image_location) do
         0 ->
           profile_params
+
         _ ->
           Map.put(profile_params, "profile_image_location", Enum.at(profile_image_location, 0))
       end
@@ -52,7 +56,23 @@ defmodule MakerPassportWeb.ProfileLive.ProfileFormComponent do
     save_profile(socket, profile_params)
   end
 
+  def handle_event("live_select_change", %{"text" => text, "id" => live_select_id}, socket) do
+    # Get the list of countries
+    countries = country_options()
+
+    filtered_countries =
+      Enum.filter(countries, fn {name, _code} ->
+        String.contains?(String.downcase(name), String.downcase(text))
+      end)
+
+    send_update(LiveSelect.Component, id: live_select_id, options: filtered_countries)
+
+    {:noreply, socket}
+  end
+
+
   defp save_profile(socket, profile_params) do
+    profile_params = check_or_create_location(profile_params)
     case Maker.update_profile(socket.assigns.profile, profile_params) do
       {:ok, _profile} ->
         {:noreply,
@@ -64,6 +84,35 @@ defmodule MakerPassportWeb.ProfileLive.ProfileFormComponent do
         {:noreply, assign(socket, form: to_form(changeset))}
     end
   end
+
+  defp check_or_create_location(%{"country" => ""} = profile_params) do
+    Map.merge(profile_params, %{"location_id" => ""})
+  end
+
+  defp check_or_create_location(%{"country" => country} = profile_params)
+       when country != "" do
+    location = Maker.get_or_create_location(country, profile_params["city"])
+    Map.merge(profile_params, %{"location_id" => location.id})
+  end
+
+  defp check_or_create_location(profile_params), do: profile_params
+
+  defp country_options do
+    Countries.all()
+    |> Enum.map(fn country ->
+      {country.name, country.alpha2}
+    end)
+    |> Enum.sort_by(fn {name, _code} -> name end)
+  end
+
+  def get_country_name(%{country: country_code}) do
+    case Countries.get(country_code) do
+      nil -> "Unknown"
+      country -> {country.name, country_code}
+    end
+  end
+
+  def get_country_name(_), do: ""
 
   defp presign_upload(entry, socket) do
     config = %{
@@ -79,7 +128,6 @@ defmodule MakerPassportWeb.ProfileLive.ProfileFormComponent do
         max_file_size: socket.assigns.uploads.profile_image.max_file_size,
         expires_in: :timer.hours(1)
       )
-
 
     metadata = %{
       uploader: "S3",

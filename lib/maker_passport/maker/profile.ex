@@ -7,7 +7,7 @@ defmodule MakerPassport.Maker.Profile do
   import Ecto.Changeset
 
   alias MakerPassport.Accounts.User
-  alias MakerPassport.Maker.{Certification, Skill, Website}
+  alias MakerPassport.Maker.{Certification, Skill, Location, Website}
 
   schema "profiles" do
     field :bio, :string
@@ -15,6 +15,7 @@ defmodule MakerPassport.Maker.Profile do
     field :profile_image_location, :string, default: ""
 
     belongs_to :user, User
+    belongs_to :location, Location
     has_many :certifications, Certification
     has_many :websites, Website
 
@@ -28,20 +29,15 @@ defmodule MakerPassport.Maker.Profile do
   @doc false
   def changeset(profile, attrs) do
     profile
-    |> cast(attrs, [:name, :bio, :profile_image_location])
+    |> cast(attrs, [:name, :bio, :profile_image_location, :location_id])
     |> validate_required([:name])
-
     # |> foreign_key_constraint(:user_id)
     # |> unique_constraint(:user_id)
   end
 
   def profile_complete?(%User{profile: profile}) when not is_nil(profile) do
-    # Add all required profile fields here
-    not is_nil(profile.name) and
-      not is_nil(profile.bio) and
-      not is_nil(profile.profile_image_location)
-
-    # Add other required fields
+    required_fields = [:name, :bio, :profile_image_location, :location_id]
+    Enum.all?(required_fields, &(not is_nil(Map.get(profile, &1))))
   end
 
   def profile_complete?(_user), do: false
