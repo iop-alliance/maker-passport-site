@@ -52,10 +52,9 @@ defmodule MakerPassportWeb.ProfileLive.Index do
   end
 
   @impl true
-  def handle_info({:typeahead, {name, _}, id}, socket) do
+  def handle_info({:typeahead, {name, _}, _}, socket) do
     socket =
       socket
-      |> push_event("set-input-value", %{id: id, label: name})
       |> update(:search_skills, fn skills -> [name | skills] end)
 
     profiles =
@@ -87,5 +86,9 @@ defmodule MakerPassportWeb.ProfileLive.Index do
           |> Enum.reject(fn profile -> profile.user && profile.user.id == user.id end)
       end
     {:noreply, stream(socket, :profiles, profiles) |> assign(:search_skills, updated_skills)}
+  end
+
+  defp remove_selected_skill(skills, selected_skills) do
+    Enum.filter(skills, fn {skill, _} -> skill not in selected_skills end)
   end
 end

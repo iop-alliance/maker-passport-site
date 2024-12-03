@@ -12,6 +12,7 @@
         fn search_text ->
           Maker.search_skills(search_text)
           |> Maker.to_skill_list()
+          |> remove_selected_skill(@search_skills)
         end
       }
       on_select={fn skill -> send(self(), {:typeahead, skill, "skills-search-picker"}) end}
