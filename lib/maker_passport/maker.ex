@@ -18,11 +18,27 @@ defmodule MakerPassport.Maker do
       [%Profile{}, ...]
 
   """
-  def list_profiles do
+  def list_profiles(skills \\ []) do
     Repo.all(Profile) |> Repo.preload([:skills, :user])
+    query =
+    Profile
+    |> join(:left, [p], s in assoc(p, :skills))
+    |> maybe_filter_by_skills(skills)
+    |> preload([:skills, :user])
+    |> distinct([p], p.id)
+
+    Repo.all(query)
+end
+
+  defp maybe_filter_by_skills(query, []), do: query
+  defp maybe_filter_by_skills(query, skills) do
+    query
+    |> where([p, s], s.name in ^skills)
+    |> group_by([p], p.id)
+    |> having([p, s], count(s.id) == ^length(skills))
   end
 
-  def list_profiles(criteria) when is_list(criteria) do
+  def list_profiles_by_criteria(criteria) when is_list(criteria) do
     query = from(p in Profile, where: not is_nil(p.name))
 
     Enum.reduce(criteria, query, fn

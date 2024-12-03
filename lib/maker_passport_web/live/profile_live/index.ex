@@ -5,20 +5,21 @@ defmodule MakerPassportWeb.ProfileLive.Index do
 
   alias MakerPassport.Maker
   alias MakerPassport.Maker.Profile
-
+  import MakerPassportWeb.ProfileLive.TypeaheadComponent, only: [typeahead: 1]
   import MakerPassportWeb.CustomComponents
 
   @impl true
   def mount(_params, _session, socket) do
-    profiles = 
+    profiles =
       case socket.assigns.current_user do
         nil -> Maker.list_profiles()
-        user -> 
+        user ->
           Maker.list_profiles()
           |> Enum.reject(fn profile -> profile.user && profile.user.id == user.id end)
       end
 
-    {:ok, stream(socket, :profiles, profiles)}
+    socket = stream(socket, :profiles, profiles)
+    {:ok, socket}
   end
 
   @impl true
@@ -41,6 +42,7 @@ defmodule MakerPassportWeb.ProfileLive.Index do
   defp apply_action(socket, :index, _params) do
     socket
     |> assign(:page_title, "Listing Profiles")
+    |> assign(:search_skills, [])
     |> assign(:profile, nil)
   end
 
@@ -50,10 +52,40 @@ defmodule MakerPassportWeb.ProfileLive.Index do
   end
 
   @impl true
+  def handle_info({:typeahead, {name, _}, id}, socket) do
+    socket =
+      socket
+      |> push_event("set-input-value", %{id: id, label: name})
+      |> update(:search_skills, fn skills -> [name | skills] end)
+
+    profiles =
+      case socket.assigns.current_user do
+        nil -> Maker.list_profiles(socket.assigns.search_skills)
+        user ->
+          Maker.list_profiles(socket.assigns.search_skills)
+          |> Enum.reject(fn profile -> profile.user && profile.user.id == user.id end)
+      end
+
+    {:noreply, stream(socket, :profiles, profiles)}
+  end
+
+  @impl true
   def handle_event("delete", %{"id" => id}, socket) do
     profile = Maker.get_profile!(id)
     {:ok, _} = Maker.delete_profile(profile)
 
     {:noreply, stream_delete(socket, :profiles, profile)}
+  end
+
+  def handle_event("remove-skill", %{"skill_name" => skill_name}, socket) do
+    updated_skills = Enum.filter(socket.assigns.search_skills, fn skill -> skill != skill_name end)
+    profiles =
+      case socket.assigns.current_user do
+        nil -> Maker.list_profiles(updated_skills)
+        user ->
+          Maker.list_profiles(updated_skills)
+          |> Enum.reject(fn profile -> profile.user && profile.user.id == user.id end)
+      end
+    {:noreply, stream(socket, :profiles, profiles) |> assign(:search_skills, updated_skills)}
   end
 end
