@@ -10,7 +10,7 @@ defmodule MakerPassportWeb.HomeLive.Index do
   @impl true
   def mount(_params, _session, socket) do
     latest_profiles =
-      Maker.list_profiles(
+      Maker.list_profiles_by_criteria(
         limit: 4,
         sort: %{sort_by: :updated_at, sort_order: :desc},
         preload: [:skills]
