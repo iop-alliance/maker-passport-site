@@ -1,13 +1,14 @@
-<div class="flex items-center space-x-4">
-  <.header>
+<div>
+  <div class="text-[#1C1D22] text-2xl font-medium leading-normal">
     Makers
-  </.header>
+  </div>
 
-  <div class="flex space-x-4 w-full">
+  <div class="flex space-x-4 items-center w-full">
+    <div>Filter by skill</div>
     <.typeahead
       id="skills-search-picker"
-      class="w-full"
-      placeholder="Search by skill..."
+      class="w-full rounded-md"
+      placeholder="Skill..."
       on_search={
         fn search_text ->
           Maker.search_skills(search_text)
@@ -19,7 +20,10 @@
     />
   </div>
 </div>
-<div id="skills-list" class="mt-6 flex flex-wrap gap-2">
+<div :if={@search_skills != []} id="skills-list" class="mt-6 flex flex-wrap gap-2 items-center">
+  <div>
+    Showing makers with these skills:
+  </div>
   <div
     :for={skill <- @search_skills}
     class="me-4 ps-3 pe-2 py-2 text-gray-700 bg-neutral/20 rounded-lg"
@@ -36,8 +40,19 @@
   </div>
 </div>
 
+<div
+  :if={@no_skills_results == true}
+  class="text-[#1C1D22] text-2xl font-medium leading-normal mt-4"
+>
+  No makers found with this combination of skills
+</div>
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-5">
-  <div :for={{id, profile} <- @streams.profiles} id={id} phx-click={JS.navigate(~p"/profiles/#{profile}")} class="cursor-pointer">
+  <div
+    :for={{id, profile} <- @streams.profiles}
+    id={id}
+    phx-click={JS.navigate(~p"/profiles/#{profile}")}
+    class="cursor-pointer"
+  >
     <div class="w-full h-full bg-white shadow rounded border border-transparent hover:border-blue-500 cursor-pointer">
       <div class="h-48 w-full checker-bg flex items-center justify-center p-4 text-blue-500">
         <.avatar profile={profile} size={36} />
@@ -46,13 +61,21 @@
         <div class="flex items-center justify-between">
           <h1 class="text-gray-600 font-medium text-lg text-center"><%= profile.name %></h1>
         </div>
-        <%= profile.skills |> Enum.take(3) |> Enum.map(&(&1.name)) |> Enum.join(", ") %><%= if length(profile.skills) > 3 do %>, &hellip;<% end %>
+        <%= profile.skills |> Enum.take(3) |> Enum.map(& &1.name) |> Enum.join(", ") %>
+        <%= if length(profile.skills) > 3 do %>
+          , &hellip;
+        <% end %>
       </div>
     </div>
   </div>
 </div>
 
-<.modal :if={@live_action in [:new, :edit]} id="profile-modal" show on_cancel={JS.patch(~p"/profiles")}>
+<.modal
+  :if={@live_action in [:new, :edit]}
+  id="profile-modal"
+  show
+  on_cancel={JS.patch(~p"/profiles")}
+>
   <.live_component
     module={MakerPassportWeb.ProfileLive.FormComponent}
     id={@profile.id || :new}
