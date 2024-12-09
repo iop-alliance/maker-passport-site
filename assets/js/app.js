@@ -23,10 +23,12 @@ import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
 import Uploaders from "./uploaders"
 import {Combobox, ComboboxOption} from "./combobox"
+import LiveSelect from "./live_select"
 
 let Hooks =  {}
 Hooks.Combobox = Combobox
 Hooks.ComboboxOption = ComboboxOption
+Hooks.LiveSelect = LiveSelect
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {

@@ -9,7 +9,9 @@ module.exports = {
   content: [
     "./js/**/*.js",
     "../lib/maker_passport_web.ex",
-    "../lib/maker_passport_web/**/*.*ex"
+    "../lib/maker_passport_web/**/*.*ex",
+    '../deps/live_select/lib/live_select/component.*ex',
+
   ],
   theme: {
     extend: {

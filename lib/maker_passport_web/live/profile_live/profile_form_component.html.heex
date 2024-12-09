@@ -1,13 +1,53 @@
 <div>
   <.simple_form
-      for={@form}
-      id="profile-form"
-      phx-target={@myself}
-      phx-change="validate"
-      phx-submit="save"
+    for={@form}
+    id="profile-form"
+    phx-target={@myself}
+    phx-change="validate"
+    phx-submit="save"
   >
-    <.input field={@form[:name]} type="text" label="Name" class="" />
-    <.input field={@form[:bio]} type="textarea" label="Bio" class="h-48" />
+    <.input
+      field={@form[:name]}
+      type="text"
+      label="Name"
+      class="input input-bordered w-full max-w-xs"
+    />
+    
+    <div>
+      <.label for="Country">Country</.label>
+      <.live_select 
+        field={@form[:country]} 
+        phx-target={@myself} 
+        allow_clear={true}
+        id="country_search" 
+        value={@form[:country].value || get_country_name(@profile.location)} 
+      />    
+    </div>
+    
+    <div>
+    <.label for="City">City</.label>
+    <.typeahead
+      id="cities-picker"
+      class="w-full rounded-s-lg"
+      value={@form[:city].value || (@profile.location && @profile.location.city)} 
+      name="profile[city]"
+      disabled={is_nil(@form[:country].value) || @form[:country].value == ""}
+        on_search={
+          fn search_text ->
+            Maker.search_cities(search_text)
+            |> Maker.to_city_list(@profile.location_id)
+          end
+        }
+        on_select={fn city -> send(self(), {:typeahead, city, "cities-picker"}) end}
+    />
+    </div>
+
+    <.input
+      field={@form[:bio]}
+      type="textarea"
+      label="Bio"
+      class="textarea textarea-bordered h-48"
+    />
 
     <div class="flex gap-3">
       <%= unless @profile.profile_image_location == nil || @profile.profile_image_location == "" do %>
@@ -18,8 +58,14 @@
         </div>
       <% end %>
       <div>
-        <div phx-drop-target={@uploads.profile_image.ref} class="border border-dashed border-slate-400 rounded p-4">
-          <.live_file_input upload={@uploads.profile_image} class="file-input file-input-bordered w-full max-w-sm mr-1" />
+        <div
+          phx-drop-target={@uploads.profile_image.ref}
+          class="border border-dashed border-slate-400 rounded p-4"
+        >
+          <.live_file_input
+            upload={@uploads.profile_image}
+            class="file-input file-input-bordered w-full max-w-sm mr-1"
+          />
           <p class="text-center">or drag and drop here</p>
         </div>
         <div class="mt-1">
@@ -40,13 +86,20 @@
           </div>
         </div>
         <div class="flex-none w-14">
-        <%= entry.progress %>%
+          <%= entry.progress %>%
         </div>
         <div class="flex-1">
-        <progress class="progress progress-primary" value={"#{entry.progress}%"} max="100"></progress>
+          <progress class="progress progress-primary" value={"#{entry.progress}%"} max="100">
+          </progress>
         </div>
         <div class="flex-none w-14">
-          <button phx-click="cancel" phx-value-ref={entry.ref} class="btn btn-sm btn-circle btn-ghost">✕</button>
+          <button
+            phx-click="cancel"
+            phx-value-ref={entry.ref}
+            class="btn btn-sm btn-circle btn-ghost"
+          >
+            ✕
+          </button>
         </div>
       </div>
       <.error :for={err <- upload_errors(@uploads.profile_image, entry)}>

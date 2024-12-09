@@ -7,7 +7,7 @@ defmodule MakerPassport.Maker do
   alias MakerPassport.Accounts
   alias MakerPassport.Repo
 
-  alias MakerPassport.Maker.{Profile, Skill, ProfileSkill}
+  alias MakerPassport.Maker.{Certification, Profile, ProfileSkill, Skill, Website, Location}
 
   @doc """
   Returns the list of profiles.
@@ -18,11 +18,27 @@ defmodule MakerPassport.Maker do
       [%Profile{}, ...]
 
   """
-  def list_profiles do
-    Repo.all(Profile) |> Repo.preload(:skills)
+  def list_profiles(skills \\ []) do
+    Repo.all(Profile) |> Repo.preload([:skills, :user])
+    query =
+    Profile
+    |> join(:left, [p], s in assoc(p, :skills))
+    |> maybe_filter_by_skills(skills)
+    |> preload([:skills, :user])
+    |> distinct([p], p.id)
+
+    Repo.all(query)
+end
+
+  defp maybe_filter_by_skills(query, []), do: query
+  defp maybe_filter_by_skills(query, skills) do
+    query
+    |> where([p, s], s.name in ^skills)
+    |> group_by([p], p.id)
+    |> having([p, s], count(s.id) == ^length(skills))
   end
 
-  def list_profiles(criteria) when is_list(criteria) do
+  def list_profiles_by_criteria(criteria) when is_list(criteria) do
     query = from(p in Profile, where: not is_nil(p.name))
 
     Enum.reduce(criteria, query, fn
@@ -36,6 +52,7 @@ defmodule MakerPassport.Maker do
         from q in query, preload: ^preload
     end)
     |> Repo.all()
+    |> Repo.preload([:user])
   end
 
   @doc """
@@ -52,7 +69,13 @@ defmodule MakerPassport.Maker do
       ** (Ecto.NoResultsError)
 
   """
-  def get_profile!(id), do: Repo.get!(Profile, id) |> Repo.preload(:user) |> Repo.preload([:skills])
+  def get_profile!(id),
+    do:
+      Repo.get!(Profile, id)
+      |> Repo.preload(:user)
+      |> Repo.preload([:skills])
+      |> Repo.preload(:certifications)
+      |> Repo.preload(:websites)
 
   def get_profile_by_user_id!(user_id) do
     user =
@@ -73,8 +96,6 @@ defmodule MakerPassport.Maker do
     |> Repo.preload(:user)
     |> Repo.preload([:skills])
   end
-
-
 
   @doc """
   Creates a profile.
@@ -141,7 +162,28 @@ defmodule MakerPassport.Maker do
     Profile.changeset(profile, attrs)
   end
 
-   @doc """
+  @doc """
+  Create %Location{} or get %Location{}.
+
+  ## Examples
+
+      iex> get_or_create_location("Uk", "London")
+      %Location{}
+
+  """
+  def get_or_create_location(country, city) do
+    case Repo.one(from l in Location, where: ilike(l.country, ^country) and ilike(l.city, ^city)) do
+      nil ->
+        %Location{country: country, city: city}
+        |> Location.changeset()
+        |> Repo.insert!()
+
+      location ->
+        location
+    end
+  end
+
+  @doc """
   Returns the list of skills.
 
   ## Examples
@@ -278,6 +320,7 @@ defmodule MakerPassport.Maker do
     profile_skills = Repo.all(from ps in ProfileSkill, where: ps.profile_id == ^profile_id)
     skill_ids_to_exclude = Enum.map(profile_skills, & &1.skill_id)
     skills = Enum.reject(skills, &(&1.id in skill_ids_to_exclude))
+
     skills
     |> Enum.map(&to_skill_tuple/1)
     |> Enum.sort_by(&elem(&1, 0))
@@ -289,8 +332,199 @@ defmodule MakerPassport.Maker do
 
   def has_skill?(profile, skill_id) do
     # Check if the profile has the skill by querying the database
-    Repo.exists?(from s in ProfileSkill,
-      where: s.profile_id == ^profile.id and s.skill_id == ^skill_id
+    Repo.exists?(
+      from s in ProfileSkill,
+        where: s.profile_id == ^profile.id and s.skill_id == ^skill_id
     )
+  end
+
+  def search_cities(""), do: []
+
+  def search_cities(search_text) do
+    Repo.all(from l in Location, where: ilike(l.city, ^"%#{search_text}%"))
+  end
+
+  def to_city_list(cities, nil) do
+    cities
+    |> Enum.map(&to_city_tuple/1)
+    |> Enum.sort_by(&elem(&1, 0))
+  end
+
+  def to_city_list(cities, location_id) do
+    cities = Enum.filter(cities, &(&1.id != location_id))
+
+    cities
+    |> Enum.map(&to_city_tuple/1)
+    |> Enum.sort_by(&elem(&1, 0))
+  end
+
+  defp to_city_tuple(location) do
+    {location.city, location.id}
+  end
+
+  @doc """
+  Gets a single website.
+
+  Raises `Ecto.NoResultsError` if the Website does not exist.
+
+  ## Examples
+
+      iex> get_website!(123)
+      %Website{}
+
+      iex> get_website!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_website!(id), do: Repo.get!(Website, id)
+
+  @doc """
+  Creates a website,
+
+  ## Examples
+
+      iex> create_website(%{field: value})
+      {:ok, %Website{}}
+
+      iex> create_website(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_website(attrs \\ %{}) do
+    %Website{}
+    |> Website.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a website.
+
+  ## Examples
+
+      iex> update_website(website, %{field: new_value})
+      {:ok, %Website{}}
+
+      iex> update_website(website, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_website(%Website{} = website, attrs) do
+    website
+    |> Website.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a website.
+
+  ## Examples
+
+      iex> delete_website(website)
+      {:ok, %Website{}}
+
+      iex> delete_website(website)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_website(%Website{} = website) do
+    Repo.delete(website)
+  end
+
+  def remove_website(website_id) do
+    website = get_website!(website_id)
+    Repo.delete(website)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking website changes.
+
+  ## Examples
+
+      iex> change_website(website)
+      %Ecto.Changeset{data: %Website{}}
+
+  """
+  def change_website(%Website{} = website, attrs \\ %{}) do
+    Website.changeset(website, attrs)
+  end
+
+  def add_website(profile_id, website_params) do
+    website_params = Map.put(website_params, "profile_id", profile_id)
+    create_website(website_params)
+  end
+
+  @doc """
+  Gets a single certification.
+
+  Raises `Ecto.NoResultsError` if the Certification does not exist.
+
+  ## Examples
+
+      iex> get_certification!(123)
+      %Certification{}
+
+      iex> get_certification!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_certification!(id), do: Repo.get!(Certification, id)
+
+  @doc """
+  Creates a certification,
+
+  ## Examples
+
+      iex> create_certification(%{field: value})
+      {:ok, %Certification{}}
+
+      iex> create_certification(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_certification(attrs \\ %{}) do
+    IO.inspect(attrs)
+
+    %Certification{}
+    |> Certification.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Deletes a certification.
+
+  ## Examples
+
+      iex> delete_certification(certification)
+      {:ok, %Certification{}}
+
+      iex> delete_certification(certification)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_certification(%Certification{} = certification) do
+    Repo.delete(certification)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking certification changes.
+
+  ## Examples
+
+      iex> change_certification(certification)
+      %Ecto.Changeset{data: %Certification{}}
+
+  """
+  def change_certification(%Certification{} = certification, attrs \\ %{}) do
+    Certification.changeset(certification, attrs)
+  end
+
+  def add_certification(profile_id, certification_params) do
+    certification_params = Map.put(certification_params, "profile_id", profile_id)
+    create_certification(certification_params)
+  end
+
+  def remove_certification(certification_id) do
+    certification = get_certification!(certification_id)
+    Repo.delete(certification)
   end
 end

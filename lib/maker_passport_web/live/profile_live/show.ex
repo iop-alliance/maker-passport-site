@@ -4,18 +4,18 @@ defmodule MakerPassportWeb.ProfileLive.Show do
   import MakerPassportWeb.CustomComponents
   import MakerPassportWeb.ProfileLive.TypeaheadComponent, only: [typeahead: 1]
 
-  alias MakerPassport.Repo
   alias MakerPassport.Maker
-  alias MakerPassport.Maker.Skill
+  alias MakerPassport.Maker.{Certification, Skill, Website}
+  alias MakerPassport.Repo
 
   @impl true
-  def mount(_params, session, socket) do
+  def mount(_params, _session, socket) do
     {:ok, socket}
   end
 
   @impl true
   def handle_params(%{"id" => id} = params, _, socket) do
-    profile = Maker.get_profile!(id)
+    profile = Maker.get_profile!(id) |> Repo.preload(:location)
     skills = ordered_skills(profile)
 
     socket =
@@ -39,6 +39,12 @@ defmodule MakerPassportWeb.ProfileLive.Show do
     |> assign_new(:skills_form, fn ->
       to_form(Skill.changeset(%Skill{}))
     end)
+    |> assign_new(:website_form, fn ->
+      to_form(Website.changeset(%Website{}))
+    end)
+    |> assign_new(:certification_form, fn ->
+      to_form(Certification.changeset(%Certification{}))
+    end)
     |> assign(:page_title, "Edit Profile")
   end
 
@@ -47,10 +53,11 @@ defmodule MakerPassportWeb.ProfileLive.Show do
   end
 
   @impl true
-  def handle_info({:typeahead, {skill_name, _}}, socket) do
+  def handle_info({:typeahead, {name, _}, id}, socket) do
     socket =
       socket
-      |> push_event("set-input-value", %{id: "skills-picker", label: skill_name})
+      |> push_event("set-input-value", %{id: id, label: name})
+
     {:noreply, socket}
   end
 
@@ -65,8 +72,49 @@ defmodule MakerPassportWeb.ProfileLive.Show do
     {:noreply, push_navigate(socket, to: ~p"/profiles/#{socket.assigns.profile.id}/edit-profile")}
   end
 
+  @impl true
+  def handle_event("save-website", %{"website" => website_params}, socket) do
+    Maker.add_website(socket.assigns.profile.id, website_params)
+    {:noreply, push_navigate(socket, to: ~p"/profiles/#{socket.assigns.profile.id}/edit-profile")}
+  end
+
+  @impl true
+  def handle_event("validate-website", %{"website" => website_params}, socket) do
+    changeset = Maker.change_website(%Website{}, website_params)
+    {:noreply, assign(socket, website_form: to_form(changeset, action: :validate))}
+  end
+
+  def handle_event("remove-website", %{"website_id" => website_id}, socket) do
+    remove_website(socket, String.to_integer(website_id))
+    {:noreply, push_navigate(socket, to: ~p"/profiles/#{socket.assigns.profile.id}/edit-profile")}
+  end
+
+  @impl true
+  def handle_event("save-certification", %{"certification" => certification_params}, socket) do
+    save_certification(socket, certification_params, socket.assigns.profile)
+    {:noreply, push_navigate(socket, to: ~p"/profiles/#{socket.assigns.profile.id}/edit-profile")}
+  end
+
+  @impl true
+  def handle_event("validate-certification", %{"certification" => certification_params}, socket) do
+    changeset = Maker.change_certification(%Certification{}, certification_params)
+    {:noreply, assign(socket, certification_form: to_form(changeset, action: :validate))}
+  end
+
+  def handle_event("remove-certification", %{"certification_id" => certification_id}, socket) do
+    remove_certification(socket, String.to_integer(certification_id))
+    {:noreply, push_navigate(socket, to: ~p"/profiles/#{socket.assigns.profile.id}/edit-profile")}
+  end
+
+  def get_country_name(country_code) do
+    case Countries.get(country_code) do
+      nil -> "Unknown"
+      country -> country.name
+    end
+  end
+
   defp save_skill(socket, skill_name, profile) do
-    skill = check_or_create_skill(skill_name)
+    skill = skill_name |> String.trim() |> check_or_create_skill()
     add_or_update_skill(socket, skill, profile)
     assign(socket, :profile, profile)
     {:noreply, socket}
@@ -95,6 +143,21 @@ defmodule MakerPassportWeb.ProfileLive.Show do
 
   defp remove_skill(socket, skill_id, profile) do
     Maker.remove_skill(profile, skill_id)
+    socket
+  end
+
+  defp save_certification(socket, certification_params, profile) do
+    Maker.add_certification(profile.id, certification_params)
+    socket
+  end
+
+  defp remove_website(socket, website_id) do
+    Maker.remove_website(website_id)
+    socket
+  end
+
+  defp remove_certification(socket, certification_id) do
+    Maker.remove_certification(certification_id)
     socket
   end
 
