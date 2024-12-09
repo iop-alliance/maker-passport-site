@@ -19,7 +19,7 @@
     >
       <div class="layout-container flex h-full grow flex-col">
         <!-- START: Top nav -->
-        <nav class="navbar bg-base-200 border-b-2 border-gray-200 shadow-sm">
+        <nav class="navbar bg-indigo-50 border-b-2 border-gray-200 shadow-sm">
           <div class="navbar-start">
             <div class="dropdown">
               <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
@@ -74,7 +74,7 @@
               </div>
               <a
                 href="/"
-                class="text-[#1C1D22] text-xl font-bold leading-tight tracking-[-0.015em]"
+                class="text-[#1C1D22] text-xl font-bold leading-tight tracking-[-0.015em] hover:bg-indigo-100"
               >
                 Maker Passport
               </a>
@@ -85,7 +85,7 @@
               <li>
                 <.link
                   href={~p"/profiles"}
-                  class="text-[#1C1D22] text-lg font-medium leading-normal hover:text-zinc-700"
+                  class="text-[#1C1D22] text-lg font-medium leading-normal hover:text-zinc-700 hover:bg-indigo-200"
                 >
                   Makers
                 </.link>
@@ -190,10 +190,7 @@
                   </ul>
                 </div>
               <% else %>
-                <.link
-                  href={~p"/users/register"}
-                  class="btn btn-md btn-primary leading-6 hover:text-zinc-100"
-                >
+                <.link href={~p"/users/register"} class="btn btn-md btn-info leading-6">
                   Join
                 </.link>
                 <.link
