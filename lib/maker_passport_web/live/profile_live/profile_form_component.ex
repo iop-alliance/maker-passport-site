@@ -25,8 +25,7 @@ defmodule MakerPassportWeb.ProfileLive.ProfileFormComponent do
      |> assign(assigns)
      |> assign_new(:form, fn ->
        to_form(Maker.change_profile(profile))
-     end)
-    }
+     end)}
   end
 
   @impl true
@@ -70,9 +69,9 @@ defmodule MakerPassportWeb.ProfileLive.ProfileFormComponent do
     {:noreply, socket}
   end
 
-
   defp save_profile(socket, profile_params) do
     profile_params = check_or_create_location(profile_params)
+
     case Maker.update_profile(socket.assigns.profile, profile_params) do
       {:ok, _profile} ->
         {:noreply,

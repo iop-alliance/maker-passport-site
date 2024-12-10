@@ -20,17 +20,19 @@ defmodule MakerPassport.Maker do
   """
   def list_profiles(skills \\ []) do
     Repo.all(Profile) |> Repo.preload([:skills, :user])
+
     query =
-    Profile
-    |> join(:left, [p], s in assoc(p, :skills))
-    |> maybe_filter_by_skills(skills)
-    |> preload([:skills, :user])
-    |> distinct([p], p.id)
+      Profile
+      |> join(:left, [p], s in assoc(p, :skills))
+      |> maybe_filter_by_skills(skills)
+      |> preload([:skills, :user])
+      |> distinct([p], p.id)
 
     Repo.all(query)
-end
+  end
 
   defp maybe_filter_by_skills(query, []), do: query
+
   defp maybe_filter_by_skills(query, skills) do
     query
     |> where([p, s], s.name in ^skills)
@@ -482,8 +484,6 @@ end
 
   """
   def create_certification(attrs \\ %{}) do
-    IO.inspect(attrs)
-
     %Certification{}
     |> Certification.changeset(attrs)
     |> Repo.insert()

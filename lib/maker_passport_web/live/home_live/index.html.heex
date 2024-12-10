@@ -25,9 +25,19 @@
         </div>
       </div>
     </div>
-    <h2 class="text-[#1C1D22] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">
-      Recently Active Makers
-    </h2>
+    <div class="flex w-full items-center">
+      <h2 class="grow text-[#1C1D22] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">
+        Recently Active Makers
+      </h2>
+      <div class="justify-self-end">
+        <.link
+          href={~p"/profiles"}
+          class="text-[#1C1D22] underline font-bold leading-normal hover:text-blue-700"
+        >
+          See all
+        </.link>
+      </div>
+    </div>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <%= for profile <- @latest_profiles do %>
         <.link
