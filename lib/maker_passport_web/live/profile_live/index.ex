@@ -56,8 +56,6 @@ defmodule MakerPassportWeb.ProfileLive.Index do
           |> Enum.reject(fn profile -> profile.user && profile.user.id == user.id end)
       end
 
-    IO.inspect(profiles)
-
     socket =
       socket
       |> assign(:no_skills_results, profiles == [])
