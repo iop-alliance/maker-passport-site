@@ -12,12 +12,14 @@
     </script>
   </head>
   <body>
-    <div class="relative flex size-full min-h-screen flex-col bg-[#F9FAFA] group/design-root overflow-x-hidden" 
-        style='font-family: "Space Grotesk", "Noto Sans", sans-serif;'>
+    <div
+      class="relative flex size-full min-h-screen flex-col bg-[#F9FAFA] group/design-root 
+             overflow-x-hidden"
+      style='font-family: "Space Grotesk", "Noto Sans", sans-serif;'
+    >
       <div class="layout-container flex h-full grow flex-col">
-
         <!-- START: Top nav -->
-        <nav class="navbar bg-base-700">
+        <nav class="navbar bg-indigo-50 border-b-2 border-gray-200 shadow-sm">
           <div class="navbar-start">
             <div class="dropdown">
               <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
@@ -26,35 +28,56 @@
                   class="h-5 w-5"
                   fill="none"
                   viewBox="0 0 24 24"
-                  stroke="currentColor">
+                  stroke="currentColor"
+                >
                   <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     stroke-width="2"
-                    d="M4 6h16M4 12h8m-8 6h16" />
+                    d="M4 6h16M4 12h8m-8 6h16"
+                  />
                 </svg>
               </div>
               <ul
                 tabindex="0"
-                class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
+                class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
+              >
                 <li>
                   <.link
                     href={~p"/profiles"}
                     class="text-[#1C1D22] text-sm font-medium leading-normal hover:text-zinc-700"
                   >
                     Makers
-                  </.link>                    
+                  </.link>
                 </li>
               </ul>
             </div>
-            <div class="flex items-center gap-4 text-[#1C1D22]">
+            <!-- Logo: large screen -->
+            <div class="flex items-center gap-4 text-[#1C1D22] ms-2">
               <div class="size-4">
                 <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path fill-rule="evenodd" clip-rule="evenodd" d="M24 18.4228L42 11.475V34.3663C42 34.7796 41.7457 35.1504 41.3601 35.2992L24 42V18.4228Z" fill="currentColor"></path>
-                  <path fill-rule="evenodd" clip-rule="evenodd" d="M24 8.18819L33.4123 11.574L24 15.2071L14.5877 11.574L24 8.18819ZM9 15.8487L21 20.4805V37.6263L9 32.9945V15.8487ZM27 37.6263V20.4805L39 15.8487V32.9945L27 37.6263ZM25.354 2.29885C24.4788 1.98402 23.5212 1.98402 22.646 2.29885L4.98454 8.65208C3.7939 9.08038 3 10.2097 3 11.475V34.3663C3 36.0196 4.01719 37.5026 5.55962 38.098L22.9197 44.7987C23.6149 45.0671 24.3851 45.0671 25.0803 44.7987L42.4404 38.098C43.9828 37.5026 45 36.0196 45 34.3663V11.475C45 10.2097 44.2061 9.08038 43.0155 8.65208L25.354 2.29885Z" fill="currentColor"></path>
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M24 18.4228L42 11.475V34.3663C42 34.7796 41.7457 35.1504 41.3601 35.2992L24 42V18.4228Z"
+                    fill="currentColor"
+                  >
+                  </path>
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M24 8.18819L33.4123 11.574L24 15.2071L14.5877 11.574L24 8.18819ZM9 15.8487L21 20.4805V37.6263L9 32.9945V15.8487ZM27 37.6263V20.4805L39 15.8487V32.9945L27 37.6263ZM25.354 2.29885C24.4788 1.98402 23.5212 1.98402 22.646 2.29885L4.98454 8.65208C3.7939 9.08038 3 10.2097 3 11.475V34.3663C3 36.0196 4.01719 37.5026 5.55962 38.098L22.9197 44.7987C23.6149 45.0671 24.3851 45.0671 25.0803 44.7987L42.4404 38.098C43.9828 37.5026 45 36.0196 45 34.3663V11.475C45 10.2097 44.2061 9.08038 43.0155 8.65208L25.354 2.29885Z"
+                    fill="currentColor"
+                  >
+                  </path>
                 </svg>
               </div>
-              <a href="/" class="text-[#1C1D22] text-xl font-bold leading-tight tracking-[-0.015em]">Maker Passport</a>
+              <a
+                href="/"
+                class="text-[#1C1D22] text-xl font-bold leading-tight tracking-[-0.015em] hover:bg-indigo-100"
+              >
+                Maker Passport
+              </a>
             </div>
           </div>
           <div class="navbar-center hidden lg:flex">
@@ -62,48 +85,75 @@
               <li>
                 <.link
                   href={~p"/profiles"}
-                  class="text-[#1C1D22] text-sm font-medium leading-normal hover:text-zinc-700"
+                  class="text-[#1C1D22] text-lg font-medium leading-normal hover:text-zinc-700 hover:bg-indigo-200"
                 >
                   Makers
-                </.link>                    
+                </.link>
               </li>
             </ul>
           </div>
           <div class="navbar-end">
             <div class="flex items-center gap-4">
               <%= if @current_user do %>
-                <span class="text-[#1C1D22] text-sm font-medium leading-normal" href="#"><%= @current_user.profile.name %></span>
+                <span class="text-[#1C1D22] text-sm font-medium leading-normal" href="#">
+                  <%= @current_user.profile.name %>
+                </span>
                 <div class="dropdown dropdown-end">
                   <div tabindex="0" role="button">
                     <div class="avatar flex items-center justify-center relative">
                       <%= if @current_user.profile.profile_image_location do %>
                         <div class="w-10 rounded-full shadow-2xl">
-                          <img src={@current_user.profile.profile_image_location} alt="Your profile image" />
+                          <img
+                            src={@current_user.profile.profile_image_location}
+                            alt="Your profile image"
+                          />
                         </div>
                       <% else %>
                         <div class="w-10 h-10 bg-indigo-100 mx-auto rounded-full shadow-2xl flex items-center justify-center text-indigo-500">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto" viewBox="0 0 20 20" fill="currentColor"> 
-                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-8 w-8 mx-auto"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fill-rule="evenodd"
+                              d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                              clip-rule="evenodd"
+                            />
                           </svg>
                         </div>
-                      <% end %>              
+                      <% end %>
                     </div>
                   </div>
-                  <ul tabindex="0" class="dropdown-content menu bg-slate-50 rounded-box z-[1] w-52 p-2 shadow-lg border mt-1">
+                  <ul
+                    tabindex="0"
+                    class="dropdown-content menu bg-slate-50 rounded-box z-[1] w-52 p-2 shadow-lg border mt-1"
+                  >
                     <li>
                       <%= if !@current_user.profile_complete do %>
                         <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
                           <div class="flex">
                             <div class="flex-shrink-0">
                               <!-- Heroicon name: mini/exclamation-triangle -->
-                              <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                              <svg
+                                class="h-5 w-5 text-yellow-400"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                              >
                                 <path d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 6a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 6zm0 9a1 1 0 100-2 1 1 0 000 2z" />
                               </svg>
                             </div>
                             <div class="ml-3">
                               <p class="text-sm text-yellow-700">
-                                Your profile is incomplete. 
-                                <.link navigate={~p"/profiles/#{@current_user.profile.id}/edit-profile"} class="font-medium underline hover:text-yellow-600">
+                                Your profile is incomplete.
+                                <.link
+                                  navigate={
+                                    ~p"/profiles/#{@current_user.profile.id}/edit-profile"
+                                  }
+                                  class="font-medium underline hover:text-yellow-600"
+                                >
                                   Complete your profile here
                                 </.link>
                               </p>
@@ -118,7 +168,7 @@
                         class="text-[#1C1D22] text-sm font-medium leading-normal hover:text-zinc-700"
                       >
                         My Profile
-                      </.link>                    
+                      </.link>
                     </li>
                     <li>
                       <.link
@@ -140,15 +190,12 @@
                   </ul>
                 </div>
               <% else %>
-                <.link
-                  href={~p"/users/register"}
-                  class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
-                >
-                  Register
+                <.link href={~p"/users/register"} class="btn btn-md btn-info leading-6">
+                  Join
                 </.link>
                 <.link
                   href={~p"/users/log_in"}
-                  class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+                  class="btn btn-md btn-accent leading-6 hover:text-zinc-100 me-2"
                 >
                   Log in
                 </.link>
@@ -157,11 +204,8 @@
           </div>
         </nav>
         <!-- END: Top nav -->
-
         <%= @inner_content %>
       </div>
-
-
     </div>
   </body>
 </html>

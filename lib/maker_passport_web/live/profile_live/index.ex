@@ -12,38 +12,29 @@ defmodule MakerPassportWeb.ProfileLive.Index do
   def mount(_params, _session, socket) do
     profiles =
       case socket.assigns.current_user do
-        nil -> Maker.list_profiles()
+        nil ->
+          Maker.list_profiles()
+
         user ->
           Maker.list_profiles()
           |> Enum.reject(fn profile -> profile.user && profile.user.id == user.id end)
       end
 
-    socket = stream(socket, :profiles, profiles)
+    socket =
+      socket
+      |> assign(:page_title, "Maker Profiles")
+      |> assign(:search_skills, [])
+      |> assign(:no_skills_results, false)
+      |> assign(:profile, nil)
+      |> stream(:profiles, profiles)
+      |> assign(:filter_params, %{search_skills: [], country_search: "", city_search: ""})
+
     {:ok, socket}
   end
 
   @impl true
-  def handle_params(params, _url, socket) do
-    {:noreply, apply_action(socket, socket.assigns.live_action, params)}
-  end
-
-  defp apply_action(socket, :edit, %{"id" => id}) do
-    socket
-    |> assign(:page_title, "Edit Profile")
-    |> assign(:profile, Maker.get_profile!(id))
-  end
-
-  defp apply_action(socket, :new, _params) do
-    socket
-    |> assign(:page_title, "New Profile")
-    |> assign(:profile, %Profile{})
-  end
-
-  defp apply_action(socket, :index, _params) do
-    socket
-    |> assign(:page_title, "Listing Profiles")
-    |> assign(:filter_params, %{search_skills: [], country_search: "", city_search: ""})
-    |> assign(:profile, nil)
+  def handle_params(_params, _url, socket) do
+    {:noreply, socket}
   end
 
   @impl true
@@ -89,6 +80,30 @@ defmodule MakerPassportWeb.ProfileLive.Index do
     profiles = filter_profiles(socket.assigns.current_user, filter_params)
 
     {:noreply, stream(socket, :profiles, profiles) |> assign(:filter_params, filter_params)}
+  end
+
+  @impl true
+  def handle_info({:typeahead, {name, _}, _}, socket) do
+    socket =
+      socket
+      |> update(:search_skills, fn skills -> [name | skills] end)
+
+    profiles =
+      case socket.assigns.current_user do
+        nil ->
+          Maker.list_profiles(socket.assigns.search_skills)
+
+        user ->
+          Maker.list_profiles(socket.assigns.search_skills)
+          |> Enum.reject(fn profile -> profile.user && profile.user.id == user.id end)
+      end
+
+    socket =
+      socket
+      |> assign(:no_skills_results, profiles == [])
+      |> stream(:profiles, profiles)
+
+    {:noreply, socket}
   end
 
   @impl true
@@ -138,6 +153,33 @@ defmodule MakerPassportWeb.ProfileLive.Index do
         Maker.list_profiles(filter_params)
         |> Enum.reject(fn profile -> profile.user && profile.user.id == user.id end)
     end
+  end
+
+  defp remove_selected_skill(skills, selected_skills) do
+    Enum.filter(skills, fn {skill, _} -> skill not in selected_skills end)
+  end
+
+  def handle_event("remove-skill", %{"skill_name" => skill_name}, socket) do
+    updated_skills =
+      Enum.filter(socket.assigns.search_skills, fn skill -> skill != skill_name end)
+
+    profiles =
+      case socket.assigns.current_user do
+        nil ->
+          Maker.list_profiles(updated_skills)
+
+        user ->
+          Maker.list_profiles(updated_skills)
+          |> Enum.reject(fn profile -> profile.user && profile.user.id == user.id end)
+      end
+
+    socket =
+      socket
+      |> assign(:no_skills_results, profiles == [])
+      |> assign(:search_skills, updated_skills)
+      |> stream(:profiles, profiles)
+
+    {:noreply, socket}
   end
 
   defp remove_selected_skill(skills, selected_skills) do

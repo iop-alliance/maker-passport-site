@@ -524,8 +524,6 @@ defmodule MakerPassport.Maker do
 
   """
   def create_certification(attrs \\ %{}) do
-    IO.inspect(attrs)
-
     %Certification{}
     |> Certification.changeset(attrs)
     |> Repo.insert()
