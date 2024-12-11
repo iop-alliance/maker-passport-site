@@ -48,7 +48,7 @@
         on_search={
           fn search_text ->
             Maker.search_countries(search_text)
-            |> Maker.to_country_list()
+            |> Maker.to_country_list(@filter_params.country_search)
           end
         }
         on_select={fn country -> send(self(), {:typeahead, country, "country-search-picker"}) end}
@@ -73,7 +73,7 @@
         on_search={
           fn search_text ->
             Maker.search_cities(search_text, @filter_params.country_search)
-            |> Maker.to_city_list()
+            |> Maker.to_city_list(@filter_params.city_search)
           end
         }
         on_select={fn city -> send(self(), {:typeahead, city, "city-search-picker"}) end}

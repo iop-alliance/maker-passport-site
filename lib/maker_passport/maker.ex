@@ -366,7 +366,9 @@ defmodule MakerPassport.Maker do
     Repo.all(from l in Location, where: ilike(l.city, ^"%#{search_text}%") and l.country == ^country)
   end
 
-  def to_city_list(cities) do
+  def to_city_list(cities, selected_city) when is_binary(selected_city) do
+    cities = Enum.filter(cities, &(&1.city != selected_city))
+
     cities
     |> Enum.map(&to_city_tuple/1)
     |> Enum.sort_by(&elem(&1, 0))
@@ -390,7 +392,9 @@ defmodule MakerPassport.Maker do
     Repo.all(from c in Location, where: ilike(c.country, ^"%#{search_text}%"), distinct: c.country)
   end
 
-  def to_country_list(countries) do
+  def to_country_list(countries, selected_country) do
+    countries = Enum.filter(countries, &(&1.country != selected_country))
+
     countries
     |> Enum.map(&to_country_tuple/1)
     |> Enum.sort_by(&elem(&1, 0))
