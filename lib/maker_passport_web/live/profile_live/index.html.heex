@@ -38,63 +38,55 @@
       </div>
     </div>
 
-    <div class="col-span-1">
-      <div class="flex items-center space-x-2">
-        <div class={@filter_params.country_search == "" && "w-full" || "flex-grow max-w-[80%]"}>
-          <.typeahead
-            id="country-search-picker"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-gray-500"
-            placeholder="Select country by search..."
-            name="filter_params[country_search]"
-            value={@filter_params.country_search}
-            on_search={
-              fn search_text ->
-                Maker.search_countries(search_text)
-                |> Maker.to_country_list()
-              end
-            }
-            on_select={fn country -> send(self(), {:typeahead, country, "country-search-picker"}) end}
-          />
-        </div>
-        <button 
-          phx-click="remove-country" 
-          type="button"
-          class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 whitespace-nowrap"
-          :if={@filter_params.country_search != ""}
-        >
-          <.icon name="hero-x-circle" class="w-6 h-6" />
-        </button>
-      </div>
+    <div class="col-span-1 relative">
+      <.typeahead
+        id="country-search-picker"
+        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-gray-500 pr-10"
+        placeholder="Select country by search..."
+        name="filter_params[country_search]"
+        value={@filter_params.country_search}
+        on_search={
+          fn search_text ->
+            Maker.search_countries(search_text)
+            |> Maker.to_country_list()
+          end
+        }
+        on_select={fn country -> send(self(), {:typeahead, country, "country-search-picker"}) end}
+      />
+      <button 
+        phx-click="remove-country" 
+        type="button"
+        class="absolute right-2 top-1/2 transform -translate-y-1/2"
+        :if={@filter_params.country_search != ""}
+      >
+        <.icon name="hero-x-circle" class="w-6 h-6" />
+      </button>
     </div>
     
-    <div class="col-span-1">
-      <div class="flex items-center space-x-2">
-        <div class={@filter_params.city_search == "" && "w-full" || "flex-grow max-w-[90%]"}>
-          <.typeahead
-            id="city-search-picker"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-gray-500"
-            placeholder="Select city by search..."
-            value={@filter_params.city_search}
-            name="filter_params[city_search]"
-            on_search={
-              fn search_text ->
-                Maker.search_cities(search_text, @filter_params.country_search)
-                |> Maker.to_city_list()
-              end
-            }
-            on_select={fn city -> send(self(), {:typeahead, city, "city-search-picker"}) end}
-            disabled={@filter_params.country_search == ""}
-          />
-        </div>
-        <button 
-          phx-click="remove-city" 
-          type="button"
-          class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 whitespace-nowrap"
-          :if={@filter_params.city_search != ""}
-        >
-          <.icon name="hero-x-circle" class="w-6 h-6" />
-        </button>
-      </div>
+    <div class="col-span-1 relative">
+      <.typeahead
+        id="city-search-picker"
+        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-gray-500 pr-10"
+        placeholder="Select city by search..."
+        value={@filter_params.city_search}
+        name="filter_params[city_search]"
+        on_search={
+          fn search_text ->
+            Maker.search_cities(search_text, @filter_params.country_search)
+            |> Maker.to_city_list()
+          end
+        }
+        on_select={fn city -> send(self(), {:typeahead, city, "city-search-picker"}) end}
+        disabled={@filter_params.country_search == ""}
+      />
+      <button 
+        phx-click="remove-city" 
+        type="button"
+        class="absolute right-2 top-1/2 transform -translate-y-1/2"
+        :if={@filter_params.city_search != ""}
+      >
+        <.icon name="hero-x-circle" class="w-6 h-6" />
+      </button>
     </div>
   </div>
 </.simple_form>
