@@ -2,40 +2,101 @@
   <.header>
     Makers
   </.header>
-
-  <div class="flex space-x-4 w-full">
-    <.typeahead
-      id="skills-search-picker"
-      class="w-full"
-      placeholder="Search by skill..."
-      on_search={
-        fn search_text ->
-          Maker.search_skills(search_text)
-          |> Maker.to_skill_list()
-          |> remove_selected_skill(@search_skills)
-        end
-      }
-      on_select={fn skill -> send(self(), {:typeahead, skill, "skills-search-picker"}) end}
-    />
-  </div>
 </div>
-<div id="skills-list" class="mt-6 flex flex-wrap gap-2">
-  <div
-    :for={skill <- @search_skills}
-    class="me-4 ps-3 pe-2 py-2 text-gray-700 bg-neutral/20 rounded-lg"
-  >
-    <%= skill %>
-    <span
-      class="tooltip"
-      data-tip="Remove skill"
-      phx-click="remove-skill"
-      phx-value-skill_name={skill}
-    >
-      <.icon name="hero-x-circle" class="w-6 h-6 mb-1 hover:text-red-500 cursor-pointer" />
-    </span>
-  </div>
-</div>
+<.simple_form for={%{}} phx-change="filter-profiles">
+  <div class="grid grid-cols-2 gap-6">
+    <div class="col-span-1">
+      <.typeahead
+        id="skills-search-picker"
+        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-gray-500"
+        placeholder="Select skill by search..."
+        name="filter_params[search_skills]"
+        on_search={
+          fn search_text ->
+            Maker.search_skills(search_text)
+            |> Maker.to_skill_list()
+            |> remove_selected_skill(@filter_params.search_skills)
+          end
+        }
+        on_select={fn skill -> send(self(), {:typeahead, skill, "skills-search-picker"}) end}
+      />
+      <div id="skills-list" class="mt-6 flex flex-wrap gap-2" :if={@filter_params.search_skills != []}>
+        <div
+          :for={skill <- @filter_params.search_skills}
+          class="me-4 ps-3 pe-2 py-2 text-gray-700 bg-neutral/20 rounded-lg"
+        >
+          <%= skill %>
+          <span
+            class="tooltip"
+            data-tip="Remove skill"
+            phx-click="remove-skill"
+            phx-value-skill_name={skill}
+          >
+            <.icon name="hero-x-circle" class="w-6 h-6 mb-1 hover:text-red-500 cursor-pointer" />
+          </span>
+        </div>
+      </div>
+    </div>
 
+    <div class="col-span-1">
+      <div class="flex items-center space-x-2">
+        <div class={@filter_params.country_search == "" && "w-full" || "flex-grow max-w-[80%]"}>
+          <.typeahead
+            id="country-search-picker"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-gray-500"
+            placeholder="Select country by search..."
+            name="filter_params[country_search]"
+            value={@filter_params.country_search}
+            on_search={
+              fn search_text ->
+                Maker.search_countries(search_text)
+                |> Maker.to_country_list()
+              end
+            }
+            on_select={fn country -> send(self(), {:typeahead, country, "country-search-picker"}) end}
+          />
+        </div>
+        <button 
+          phx-click="remove-country" 
+          type="button"
+          class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 whitespace-nowrap"
+          :if={@filter_params.country_search != ""}
+        >
+          <.icon name="hero-x-circle" class="w-6 h-6" />
+        </button>
+      </div>
+    </div>
+    
+    <div class="col-span-1">
+      <div class="flex items-center space-x-2">
+        <div class={@filter_params.city_search == "" && "w-full" || "flex-grow max-w-[90%]"}>
+          <.typeahead
+            id="city-search-picker"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-gray-500"
+            placeholder="Select city by search..."
+            name="filter_params[city_search]"
+            on_search={
+              fn search_text ->
+                Maker.search_cities(search_text, @filter_params.country_search)
+                |> Maker.to_city_list()
+              end
+            }
+            on_select={fn city -> send(self(), {:typeahead, city, "city-search-picker"}) end}
+            disabled={@filter_params.country_search == ""}
+          />
+        </div>
+        <button 
+          phx-click="remove-city" 
+          type="button"
+          class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 whitespace-nowrap"
+          :if={@filter_params.city_search != ""}
+        >
+          <.icon name="hero-x-circle" class="w-6 h-6" />
+        </button>
+      </div>
+    </div>
+  </div>
+</.simple_form>
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-5">
   <div :for={{id, profile} <- @streams.profiles} id={id} phx-click={JS.navigate(~p"/profiles/#{profile}")} class="cursor-pointer">
     <div class="w-full h-full bg-white shadow rounded border border-transparent hover:border-blue-500 cursor-pointer">

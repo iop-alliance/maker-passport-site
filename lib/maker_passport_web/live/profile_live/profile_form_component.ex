@@ -61,7 +61,7 @@ defmodule MakerPassportWeb.ProfileLive.ProfileFormComponent do
     countries = country_options()
 
     filtered_countries =
-      Enum.filter(countries, fn {name, _code} ->
+      Enum.filter(countries, fn name ->
         String.contains?(String.downcase(name), String.downcase(text))
       end)
 
@@ -100,19 +100,10 @@ defmodule MakerPassportWeb.ProfileLive.ProfileFormComponent do
   defp country_options do
     Countries.all()
     |> Enum.map(fn country ->
-      {country.name, country.alpha2}
+      country.name
     end)
-    |> Enum.sort_by(fn {name, _code} -> name end)
+    |> Enum.sort_by(fn name -> name end)
   end
-
-  def get_country_name(%{country: country_code}) do
-    case Countries.get(country_code) do
-      nil -> "Unknown"
-      country -> {country.name, country_code}
-    end
-  end
-
-  def get_country_name(_), do: ""
 
   defp presign_upload(entry, socket) do
     config = %{

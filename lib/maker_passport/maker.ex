@@ -18,25 +18,41 @@ defmodule MakerPassport.Maker do
       [%Profile{}, ...]
 
   """
-  def list_profiles(skills \\ []) do
-    Repo.all(Profile) |> Repo.preload([:skills, :user])
+  def list_profiles(filter_params \\ %{}) do
     query =
     Profile
     |> join(:left, [p], s in assoc(p, :skills))
-    |> maybe_filter_by_skills(skills)
+    |> join(:left, [p], l in assoc(p, :location))
+    |> maybe_filter_by_country(filter_params)
+    |> maybe_filter_by_city(filter_params)
+    |> maybe_filter_by_skills(filter_params)
     |> preload([:skills, :user])
     |> distinct([p], p.id)
 
     Repo.all(query)
-end
+  end
 
-  defp maybe_filter_by_skills(query, []), do: query
-  defp maybe_filter_by_skills(query, skills) do
+  defp maybe_filter_by_skills(query, %{search_skills: skills}) when skills != [], do:
     query
     |> where([p, s], s.name in ^skills)
     |> group_by([p], p.id)
     |> having([p, s], count(s.id) == ^length(skills))
+
+  defp maybe_filter_by_skills(query, _), do: query
+
+  def maybe_filter_by_city(query, %{city_search: city}) when city != "" do
+    query
+    |> where([p, s, l], ilike(l.city, ^"%#{city}%"))
   end
+
+  def maybe_filter_by_city(query, _), do: query
+
+  def maybe_filter_by_country(query, %{country_search: country}) when country != "" do
+    query
+    |> where([p, s, l], ilike(l.country, ^"%#{country}%"))
+  end
+
+  def maybe_filter_by_country(query, _), do: query
 
   def list_profiles_by_criteria(criteria) when is_list(criteria) do
     query = from(p in Profile, where: not is_nil(p.name))
@@ -344,7 +360,13 @@ end
     Repo.all(from l in Location, where: ilike(l.city, ^"%#{search_text}%"))
   end
 
-  def to_city_list(cities, nil) do
+  def search_cities("", _), do: []
+
+  def search_cities(search_text, country) do
+    Repo.all(from l in Location, where: ilike(l.city, ^"%#{search_text}%") and l.country == ^country)
+  end
+
+  def to_city_list(cities) do
     cities
     |> Enum.map(&to_city_tuple/1)
     |> Enum.sort_by(&elem(&1, 0))
@@ -360,6 +382,22 @@ end
 
   defp to_city_tuple(location) do
     {location.city, location.id}
+  end
+
+  def search_countries(""), do: []
+
+  def search_countries(search_text) do
+    Repo.all(from c in Location, where: ilike(c.country, ^"%#{search_text}%"), distinct: c.country)
+  end
+
+  def to_country_list(countries) do
+    countries
+    |> Enum.map(&to_country_tuple/1)
+    |> Enum.sort_by(&elem(&1, 0))
+  end
+
+  defp to_country_tuple(country) do
+    {country.country, country.id}
   end
 
   @doc """
