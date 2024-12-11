@@ -70,9 +70,7 @@ defmodule MakerPassportWeb.ProfileLive.TypeaheadComponent do
     ~H"""
     <div class="space-y-1">
       <.label :if={@label} for={@id}><%= @label %></.label>
-      <div class=""
-        phx-click-away="hide-options"
-        phx-target={@myself}>
+      <div class="relative" phx-click-away="hide-options" phx-target={@myself}>
         <input
           type="text"
           name={@name}
