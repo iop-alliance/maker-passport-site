@@ -221,7 +221,43 @@
         </nav>
         <!-- END: Top nav -->
         <%= @inner_content %>
-      </div>
+      </div>  
+      <footer class="footer bg-base-300 text-base-content p-10">
+        <aside>
+          <img src={~p"/images/IOP-logo-white.png"} alt="Internet of Production Logo" class="h-16" />
+          <p>
+            Internet of Production is a company
+            <br />
+            and charity registered in
+            <br />
+            England and Wales. 
+            <br />
+            Charity: 1184807
+          </p>
+        </aside>
+        <nav>
+          <h6 class="footer-title">Explore</h6>
+          <.link href={~p"/profiles"} class="link link-hover">Find Makers</.link>
+          <.link href={~p"/about"} class="link link-hover">About the project</.link>
+        </nav>
+        <nav>
+          <h6 class="footer-title">Funding Partners</h6>
+          <div class="grid grid-flow-col gap-4">
+            <.link href="https://www.risa-fund.org" target="_blank" rel="noreferrer">
+              <img
+                alt="Logo of The Research and Innovation Systems for Africa (RISA) Fund"
+                src="/images/RISA-white-logo.png"
+                class="h-16 my-0"
+              />
+            </.link>
+            <img
+              alt="Logo of the Next Generation Internet Data Portability and Services Incubator"
+              src="/images/UKID-white-logo.jpg"
+              class="h-16 my-0"
+            />
+          </div>
+        </nav>
+      </footer>
     </div>
   </body>
 </html>
