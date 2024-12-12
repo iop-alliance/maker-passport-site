@@ -11,7 +11,7 @@
     <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
     </script>
   </head>
-  <body>
+  <body class="bg-[#F9FAFA]">
     <div
       class="relative flex size-full min-h-screen flex-col bg-[#F9FAFA] group/design-root 
              overflow-x-hidden"
@@ -19,7 +19,7 @@
     >
       <div class="layout-container flex h-full grow flex-col">
         <!-- START: Top nav -->
-        <nav class="navbar bg-indigo-50 border-b-2 border-gray-200 shadow-sm">
+        <nav class="navbar bg-white border-b-2 border-gray-200 shadow-sm">
           <div class="navbar-start">
             <div class="dropdown">
               <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
@@ -47,7 +47,15 @@
                     href={~p"/profiles"}
                     class="text-[#1C1D22] text-sm font-medium leading-normal hover:text-zinc-700"
                   >
-                    Makers
+                    MAKERS
+                  </.link>
+                </li>
+                <li>
+                  <.link
+                    href={~p"/about"}
+                    class="text-[#1C1D22] text-sm font-medium leading-normal hover:text-zinc-700"
+                  >
+                    ABOUT
                   </.link>
                 </li>
               </ul>
@@ -85,9 +93,18 @@
               <li>
                 <.link
                   href={~p"/profiles"}
-                  class="text-[#1C1D22] text-lg font-medium leading-normal hover:text-zinc-700 hover:bg-indigo-200"
+                  class="text-[#1C1D22] text-lg font-medium leading-normal hover:text-zinc-50 hover:bg-zinc-500"
                 >
-                  Makers
+                  MAKERS
+                </.link>
+              </li>
+              <li class="text-lg font-medium leading-normal pt-2">|</li>
+              <li>
+                <.link
+                  href={~p"/about"}
+                  class="text-[#1C1D22] text-lg font-medium leading-normal hover:text-zinc-50 hover:bg-zinc-500"
+                >
+                  ABOUT
                 </.link>
               </li>
             </ul>
@@ -205,7 +222,43 @@
         </nav>
         <!-- END: Top nav -->
         <%= @inner_content %>
-      </div>
+      </div>  
+      <footer class="footer bg-base-300 text-base-content p-10">
+        <aside>
+          <img src={~p"/images/IOP-logo-white.png"} alt="Internet of Production Logo" class="h-16" />
+          <p>
+            Internet of Production is a company
+            <br />
+            and charity registered in
+            <br />
+            England and Wales. 
+            <br />
+            Charity: 1184807
+          </p>
+        </aside>
+        <nav>
+          <h6 class="footer-title">Explore</h6>
+          <.link href={~p"/profiles"} class="link link-hover">Find Makers</.link>
+          <.link href={~p"/about"} class="link link-hover">About the project</.link>
+        </nav>
+        <nav>
+          <h6 class="footer-title">Funding Partners</h6>
+          <div class="grid grid-flow-row gap-4">
+            <.link href="https://www.risa-fund.org" target="_blank" rel="noreferrer">
+              <img
+                alt="Logo of The Research and Innovation Systems for Africa (RISA) Fund"
+                src="/images/RISA-white-logo.png"
+                class="w-32 my-0"
+              />
+            </.link>
+            <img
+              alt="Logo of the Next Generation Internet Data Portability and Services Incubator"
+              src="/images/UKID-white-logo.jpg"
+              class="w-32 my-0"
+            />
+          </div>
+        </nav>
+      </footer>
     </div>
   </body>
 </html>
