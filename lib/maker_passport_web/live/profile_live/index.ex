@@ -106,14 +106,6 @@ defmodule MakerPassportWeb.ProfileLive.Index do
     {:noreply, socket}
   end
 
-  @impl true
-  def handle_event("delete", %{"id" => id}, socket) do
-    profile = Maker.get_profile!(id)
-    {:ok, _} = Maker.delete_profile(profile)
-
-    {:noreply, stream_delete(socket, :profiles, profile)}
-  end
-
   def handle_event(_event, _params, socket) do
     {:noreply, socket}
   end
