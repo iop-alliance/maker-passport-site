@@ -12,7 +12,7 @@ defmodule MakerPassportWeb.ProfileLive.Index do
     profiles =
       case socket.assigns.current_user do
         nil ->
-          Maker.list_profiles()
+          Maker.list_profiles_by_criteria([{:sort, %{sort_by: :updated_at, sort_order: :desc}}])
 
         user ->
           Maker.list_profiles()

@@ -54,7 +54,7 @@ defmodule MakerPassport.Maker do
         from q in query, preload: ^preload
     end)
     |> Repo.all()
-    |> Repo.preload([:user])
+    |> Repo.preload([:user, :skills])
   end
 
   @doc """
