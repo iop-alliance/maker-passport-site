@@ -10,14 +10,15 @@ defmodule MakerPassportWeb.ProfileLive.Index do
   @impl true
   def mount(_params, _session, socket) do
     profiles =
-      case socket.assigns.current_user do
-        nil ->
-          Maker.list_profiles_by_criteria([{:sort, %{sort_by: :updated_at, sort_order: :desc}}])
+      Maker.list_profiles_by_criteria([{:sort, %{sort_by: :updated_at, sort_order: :desc}}])
 
-        user ->
-          Maker.list_profiles()
-          |> Enum.reject(fn profile -> profile.user && profile.user.id == user.id end)
-      end
+    profiles = case socket.assigns.current_user do
+      nil ->
+        profiles
+      user ->
+        profiles
+        |> Enum.reject(fn profile -> profile.user && profile.user.id == user.id end)
+    end
 
     socket =
       socket
