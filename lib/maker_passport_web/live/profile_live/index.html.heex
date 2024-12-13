@@ -3,33 +3,35 @@
     Makers
   </div>
   <.simple_form for={%{}} phx-change="filter-profiles">
-    <div class="grid grid-cols-2 gap-6">
-      <div class="col-span-1 relative">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+      <div class="relative">
         <.typeahead
           id="country-search-picker"
           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-gray-500 pr-10"
           placeholder="Select country by search..."
           name="filter_params[country_search]"
           value={@filter_params.country_search}
-            on_search={
+          on_search={
             fn search_text ->
               Maker.search_countries(search_text)
               |> Maker.to_country_list(@filter_params.country_search)
             end
           }
-          on_select={fn country -> send(self(), {:typeahead, country, "country-search-picker"}) end}
+          on_select={
+            fn country -> send(self(), {:typeahead, country, "country-search-picker"}) end
+          }
         />
-        <button 
-          phx-click="remove-country" 
+        <button
+          :if={@filter_params.country_search != ""}
+          phx-click="remove-country"
           type="button"
           class="absolute right-2 top-1/2 transform -translate-y-1/2"
-          :if={@filter_params.country_search != ""}
         >
           <.icon name="hero-x-circle" class="w-6 h-6" />
         </button>
       </div>
 
-      <div class="col-span-1 relative">
+      <div class="relative">
         <.typeahead
           id="city-search-picker"
           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-gray-500 pr-10"
@@ -45,16 +47,17 @@
           on_select={fn city -> send(self(), {:typeahead, city, "city-search-picker"}) end}
           disabled={@filter_params.country_search == ""}
         />
-        <button 
-          phx-click="remove-city" 
+        <button
+          :if={@filter_params.city_search != ""}
+          phx-click="remove-city"
           type="button"
           class="absolute right-2 top-1/2 transform -translate-y-1/2"
-          :if={@filter_params.city_search != ""}
         >
           <.icon name="hero-x-circle" class="w-6 h-6" />
         </button>
       </div>
-      <div class="col-span-1">
+
+      <div class="relative md:col-span-2">
         <.typeahead
           id="skills-search-picker"
           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-gray-500"
@@ -73,7 +76,11 @@
     </div>
   </.simple_form>
 </div>
-<div :if={@filter_params.search_skills != []} id="skills-list" class="mt-6 flex flex-wrap gap-2 items-center">
+<div
+  :if={@filter_params.search_skills != []}
+  id="skills-list"
+  class="mt-6 flex flex-wrap gap-2 items-center"
+>
   <div>
     Showing makers with these skills:
   </div>
