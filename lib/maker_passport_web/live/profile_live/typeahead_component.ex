@@ -81,7 +81,8 @@ defmodule MakerPassportWeb.ProfileLive.TypeaheadComponent do
             "block text-grey-700 focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 phx-no-feedback:border-gray-300",
             "phx-no-feedback:focus:border-blue-500 phx-no-feedback:focus:ring-blue-500/5",
             "phx-no-feedback:dark:border-gray-600 phx-no-feedback:dark:focus:border-blue-500 phx-no-feedback:dark:focus:ring-blue-500/5",
-            "#{@class}"
+            "#{@class}",
+            @disabled && "bg-gray-200 cursor-not-allowed"
           ]}
           role="combobox"
           phx-keydown="set-focus"
