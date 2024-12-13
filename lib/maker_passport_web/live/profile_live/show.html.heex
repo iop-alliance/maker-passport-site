@@ -13,20 +13,25 @@
   <% end %>
 </div>
 
-<div :if={@live_action != :edit_profile} class="py-8 @container max-w-5xl mx-auto" id="profile-details">
+<div
+  :if={@live_action != :edit_profile}
+  class="py-8 @container max-w-5xl mx-auto"
+  id="profile-details"
+>
   <div class="space-y-12">
     <div class="grid grid-cols-4 gap-8">
       <div class="justify-self-end">
         <.avatar profile={@profile} size={36} />
       </div>
-        <div class="col-span-3 mt-5 border border-gray-300 rounded-lg p-4">
+      <div class="col-span-3 mt-5 border border-gray-300 rounded-lg p-4">
         <h1 class="text-4xl font-bold text-gray-900 tracking-tight">
           <%= @profile.name %>
         </h1>
-        <div class="mt-4 space-y-2 text-gray-600">
+        <div :if={@profile.location} class="mt-4 space-y-2 text-gray-600">
           <p class="flex items-center gap-2">
-            <.icon name="hero-map-pin" class="w-5 h-5" :if={@profile.location} />
-            <%= @profile.location && @profile.location.country <> " . "  <> @profile.location.city %>
+            <.icon :if={@profile.location} name="hero-map-pin" class="w-5 h-5" />
+            <%= @profile.location &&
+              get_country_name(@profile.location.country) <> " . " <> @profile.location.city %>
           </p>
           <p class="leading-relaxed"><%= @profile.bio %></p>
         </div>
@@ -49,7 +54,7 @@
       </div>
     <% end %>
 
-   <%= if @profile.certifications != [] do %>
+    <%= if @profile.certifications != [] do %>
       <div class="grid grid-cols-4 gap-8">
         <div class="justify-self-end">
           <h3 class="text-lg font-semibold text-gray-800">Certifications</h3>
@@ -80,9 +85,11 @@
                 <%= if certificate.url do %>
                   <div class="text-sm font-medium text-gray-500">URL</div>
                   <div class="col-span-2 text-sm text-gray-900">
-                    <a href={certificate.url} 
-                       target="_blank" 
-                       class="text-blue-600 hover:text-blue-800 hover:underline break-all">
+                    <a
+                      href={certificate.url}
+                      target="_blank"
+                      class="text-blue-600 hover:text-blue-800 hover:underline break-all"
+                    >
                       <%= certificate.url %>
                     </a>
                   </div>
