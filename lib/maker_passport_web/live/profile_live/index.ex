@@ -55,6 +55,7 @@ defmodule MakerPassportWeb.ProfileLive.Index do
     {:noreply, stream(socket, :profiles, profiles)}
   end
 
+  @impl true
   def handle_info({:typeahead, {value, _}, id}, socket) do
     socket =
       socket
@@ -73,14 +74,17 @@ defmodule MakerPassportWeb.ProfileLive.Index do
     {:noreply, socket}
   end
 
+  @impl true
   def handle_event("filter-profiles", %{"filter_params" => %{"country_search" => ""}}, socket) do
     handle_remove_search(socket, [:city_search, :country_search])
   end
 
+  @impl true
   def handle_event("filter-profiles", %{"filter_params" => %{"city_search" => ""}}, socket) do
     handle_remove_search(socket, [:city_search])
   end
 
+  @impl true
   def handle_event("remove-skill", %{"skill_name" => skill_name}, socket) do
     filter_params = socket.assigns.filter_params
     updated_skills = Enum.filter(filter_params.search_skills, fn skill -> skill != skill_name end)
@@ -96,13 +100,16 @@ defmodule MakerPassportWeb.ProfileLive.Index do
     {:noreply, socket}
   end
 
+  @impl true
   def handle_event("remove-country", _params, socket) do
     handle_remove_search(socket, [:city_search, :country_search])
   end
 
+  @impl true
   def handle_event("remove-city", _params, socket) do
     handle_remove_search(socket, [:city_search])
   end
+
   @impl true
   def handle_event("delete", %{"id" => id}, socket) do
     profile = Maker.get_profile!(id)
@@ -111,6 +118,7 @@ defmodule MakerPassportWeb.ProfileLive.Index do
     {:noreply, stream_delete(socket, :profiles, profile)}
   end
 
+  @impl true
   def handle_event(_event, _params, socket) do
     {:noreply, socket}
   end
