@@ -55,8 +55,15 @@ defmodule MakerPassport.Maker do
   def maybe_filter_by_country(query, _), do: query
 
 
-  def list_profiles_by_criteria(criteria) when is_list(criteria) do
-    query = from(p in Profile, where: not is_nil(p.name))
+  def list_profiles_by_criteria(criteria, filter_params \\ %{}) when is_list(criteria) do
+    query = Profile
+    |> where([p], not is_nil(p.name))
+    |> join(:left, [p], s in assoc(p, :skills))
+    |> join(:left, [p], l in assoc(p, :location))
+    |> maybe_filter_by_country(filter_params)
+    |> maybe_filter_by_city(filter_params)
+    |> maybe_filter_by_skills(filter_params)
+    |> distinct([p], p.id)
 
     Enum.reduce(criteria, query, fn
       {:sort, %{sort_by: sort_by, sort_order: sort_order}}, query ->

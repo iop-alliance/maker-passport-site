@@ -146,7 +146,7 @@ defmodule MakerPassportWeb.ProfileLive.Index do
   def filter_profiles(current_user, filter_params) do
     case current_user do
       nil ->
-        Maker.list_profiles(filter_params)
+        Maker.list_profiles_by_criteria([{:sort, %{sort_by: :updated_at, sort_order: :desc}}], filter_params)
 
       user ->
         Maker.list_profiles(filter_params)
