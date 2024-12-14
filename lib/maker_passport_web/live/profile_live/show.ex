@@ -106,13 +106,6 @@ defmodule MakerPassportWeb.ProfileLive.Show do
     {:noreply, push_navigate(socket, to: ~p"/profiles/#{socket.assigns.profile.id}/edit-profile")}
   end
 
-  def get_country_name(country_code) do
-    case Countries.get(country_code) do
-      nil -> "Unknown"
-      country -> country.name
-    end
-  end
-
   defp save_skill(socket, skill_name, profile) do
     skill = skill_name |> String.trim() |> check_or_create_skill()
     add_or_update_skill(socket, skill, profile)
