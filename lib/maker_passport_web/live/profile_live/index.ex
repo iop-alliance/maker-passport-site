@@ -41,7 +41,10 @@ defmodule MakerPassportWeb.ProfileLive.Index do
   end
 
   @impl true
-  def handle_info({:typeahead, {country_name, country_code}, "country-search-picker" = id}, socket) do
+  def handle_info(
+        {:typeahead, {country_name, country_code}, "country-search-picker" = id},
+        socket
+      ) do
     socket =
       socket
       |> push_event(%{id: id, label: country_name})
@@ -72,6 +75,25 @@ defmodule MakerPassportWeb.ProfileLive.Index do
       |> stream(:profiles, profiles)
 
     {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event(
+        "filter-profiles",
+        %{"filter_params" => %{"country_search" => ""}},
+        %{assigns: %{filter_params: %{country_search: country_search}}} = socket
+      )
+      when country_search != "" do
+    handle_remove_search(socket, [:city_search, :country_search])
+  end
+
+  @impl true
+  def handle_event(
+        "filter-profiles",
+        %{"filter_params" => %{"city_search" => ""}},
+        %{assigns: %{filter_params: %{city_search: city_search}}} = socket
+      ) when city_search != "" do
+    handle_remove_search(socket, [:city_search])
   end
 
   @impl true
@@ -108,6 +130,11 @@ defmodule MakerPassportWeb.ProfileLive.Index do
     {:noreply, stream_delete(socket, :profiles, profile)}
   end
 
+  @impl true
+  def handle_event(_event, _params, socket) do
+    {:noreply, socket}
+  end
+
   defp add_filter_params("city-search-picker", filter_params, value) do
     Map.put(filter_params, :city_search, value)
   end
@@ -118,7 +145,9 @@ defmodule MakerPassportWeb.ProfileLive.Index do
 
   def filter_profiles(current_user, filter_params) do
     case current_user do
-      nil -> Maker.list_profiles(filter_params)
+      nil ->
+        Maker.list_profiles(filter_params)
+
       user ->
         Maker.list_profiles(filter_params)
         |> Enum.reject(fn profile -> profile.user && profile.user.id == user.id end)
