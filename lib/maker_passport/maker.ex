@@ -7,7 +7,7 @@ defmodule MakerPassport.Maker do
   alias MakerPassport.Accounts
   alias MakerPassport.Repo
 
-  alias MakerPassport.Maker.{Certification, Profile, ProfileSkill, Skill, Website, Location}
+  alias MakerPassport.Maker.{Certification, Email, Profile, ProfileSkill, Skill, Website, Location, Visitor}
 
   @doc """
   Returns the list of profiles.
@@ -162,6 +162,136 @@ defmodule MakerPassport.Maker do
   """
   def change_profile(%Profile{} = profile, attrs \\ %{}) do
     Profile.changeset(profile, attrs)
+  end
+
+
+  @doc """
+  Creates a email.
+
+  ## Examples
+
+      iex> create_email(%{field: value})
+      {:ok, %Email{}}
+
+      iex> create_email(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_email(attrs \\ %{}) do
+    %Email{}
+    |> Email.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Gets a visitor by token.
+
+  ## Examples
+
+      iex> get_visitor_by_token("token")
+      {:ok, %Visitor{}}
+
+      iex> get_visitor_by_token("bad_token")
+      nil
+
+  """
+  def get_visitor_by_token(token) do
+    Repo.get_by(Visitor, token: token)
+  end
+
+  @doc """
+  Gets a visitor by email.
+
+  ## Examples
+
+      iex> get_visitor_by_email("email")
+      {:ok, %Visitor{}}
+
+      iex> get_visitor_by_email("bad_email")
+      nil
+
+  """
+  def get_visitor_by_email(email) do
+    Repo.get_by(Visitor, email: email)
+  end
+
+  @doc """
+  Updates a visitor.
+
+  ## Examples
+
+      iex> update_visitor(%Visitor{}, %{is_verified: true})
+      {:ok, %Visitor{}}
+
+      iex> update_visitor(%Visitor{}, %{is_verified: false})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_visitor(%Visitor{} = visitor, attrs) do
+    visitor
+    |> Visitor.changeset(attrs)
+    |> Repo.update()
+  end
+
+
+  @doc """
+  Creates a verify visitor.
+
+  ## Examples
+
+      iex> create_and_verify_visitor(%{field: value})
+      {:ok, %Visitor{}}
+
+      iex> create_and_verify_visitor(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_and_verify_visitor(attrs \\ %{}) do
+    visitor = %Visitor{}
+    |> Map.put(:token, generate_token())
+    |> Visitor.changeset(attrs)
+    |> Repo.insert!()
+
+    url = MakerPassportWeb.Endpoint.url() <> "/verify-email?token=#{visitor.token}"
+
+    Accounts.UserNotifier.confirm_email(visitor, url)
+
+    {:ok, visitor}
+  end
+
+  @doc """
+  Updates a visitor and verifies it.
+
+  ## Examples
+
+      iex> update_and_verify_visitor(%Visitor{}, %{field: value})
+      {:ok, %Visitor{}}
+
+      iex> update_and_verify_visitor(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_and_verify_visitor(%Visitor{} = visitor) do
+    attrs = %{token: generate_token()}
+
+    visitor = visitor
+    |> Visitor.changeset(attrs)
+    |> Repo.update!()
+
+    url = MakerPassportWeb.Endpoint.url() <> "/verify-email?token=#{visitor.token}"
+
+    Accounts.UserNotifier.confirm_email(visitor, url)
+
+    {:ok, visitor}
+  end
+
+  defp generate_token() do
+    token = :crypto.strong_rand_bytes(32)
+    Base.url_encode64(token, padding: false)
+  end
+
+  def get_emails_by_visitor_id(visitor_id) do
+    Repo.all(from e in Email, where: e.visitor_id == ^visitor_id) |> Repo.preload([profile: [:user]])
   end
 
   @doc """

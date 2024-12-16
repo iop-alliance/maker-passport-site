@@ -27,6 +27,10 @@ defmodule MakerPassportWeb.ProfileLive.Show do
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
 
+  defp apply_action(socket, :contact, _params) do
+    socket
+  end
+
   defp apply_action(socket, :show, _params) do
     socket
   end
@@ -161,6 +165,7 @@ defmodule MakerPassportWeb.ProfileLive.Show do
     socket
   end
 
+  defp page_title(:contact), do: "Contact Maker"
   defp page_title(:show), do: "Show Profile"
   defp page_title(:edit_profile), do: "Edit Profile"
 end
