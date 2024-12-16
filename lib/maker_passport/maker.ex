@@ -271,8 +271,8 @@ defmodule MakerPassport.Maker do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_and_verify_visitor(%Visitor{} = visitor) do
-    attrs = %{token: generate_token()}
+  def update_and_verify_visitor(%Visitor{} = visitor, attrs) do
+    attrs = Map.put(attrs, :token, generate_token())
 
     visitor = visitor
     |> Visitor.changeset(attrs)
