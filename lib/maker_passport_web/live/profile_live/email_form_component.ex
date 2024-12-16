@@ -21,8 +21,10 @@ defmodule MakerPassportWeb.ProfileLive.EmailFormComponent do
         phx-change="validate"
         phx-submit="save"
       >
-        <.input field={@email_form[:sender_name]} type="text" label="Sender Name" />
-        <.input field={@email_form[:sender_email]} type="email" label="Sender Email" />
+        <%= if !(@current_user) do %>
+          <.input field={@email_form[:sender_name]} type="text" label="Sender Name" />
+          <.input field={@email_form[:sender_email]} type="email" label="Sender Email" />
+        <% end %>
         <.input field={@email_form[:subject]} type="text" label="Subject" />
         <.input field={@email_form[:body]} type="textarea" label="Body" />
         <:actions>
@@ -38,8 +40,8 @@ defmodule MakerPassportWeb.ProfileLive.EmailFormComponent do
     {:ok,
      socket
      |> assign_new(:email_form, fn ->
-      to_form(Email.changeset(%Email{}))
-    end)
+       to_form(Email.changeset(%Email{}))
+     end)
      |> assign(assigns)}
   end
 
@@ -50,7 +52,7 @@ defmodule MakerPassportWeb.ProfileLive.EmailFormComponent do
     {:noreply, assign(socket, :email_form, to_form(changeset, action: :validate))}
   end
 
-  def handle_event("save", %{"email" => email_params}, socket) do
+  def handle_event("save", %{"email" => email_params}, %{assigns: %{current_user: nil}} = socket) do
     case Maker.get_visitor_by_email(email_params["sender_email"]) do
       nil ->
         visitor_params = %{email: email_params["sender_email"], name: email_params["sender_name"]}
@@ -62,13 +64,38 @@ defmodule MakerPassportWeb.ProfileLive.EmailFormComponent do
         create_email(email_params, visitor, socket)
 
       _visitor ->
+        email_params = %{
+          sender_email: email_params["sender_email"],
+          maker_email: socket.assigns.profile.user.email,
+          subject: email_params["subject"],
+          body: email_params["body"]
+        }
+
         send_email(email_params, socket)
     end
+  end
 
+  def handle_event(
+        "save",
+        %{"email" => email_params},
+        %{assigns: %{current_user: current_user}} = socket
+      ) do
+    email_params = %{
+      sender_email: current_user.email,
+      maker_email: socket.assigns.profile.user.email,
+      subject: email_params["subject"],
+      body: email_params["body"]
+    }
+
+    send_email(email_params, socket)
   end
 
   def create_email(email_params, visitor, socket) do
-    email_params = Map.merge(email_params, %{"visitor_id" => visitor.id, "profile_id" => socket.assigns.profile.id})
+    email_params =
+      Map.merge(email_params, %{
+        "visitor_id" => visitor.id,
+        "profile_id" => socket.assigns.profile.id
+      })
 
     case Maker.create_email(email_params) do
       {:ok, _email} ->
@@ -83,15 +110,12 @@ defmodule MakerPassportWeb.ProfileLive.EmailFormComponent do
   end
 
   def send_email(email_params, socket) do
-    email_params = %{
-      sender_email: email_params["sender_email"],
-      maker_email: socket.assigns.profile.user.email,
-      subject: email_params["subject"],
-      body: email_params["body"]
-    }
     case UserNotifier.send_email_to_maker(email_params) do
       {:ok, _email} ->
-        {:noreply, socket |> put_flash(:info, "Email sent to maker") |> push_navigate(to: socket.assigns.navigate)}
+        {:noreply,
+         socket
+         |> put_flash(:info, "Email sent to maker")
+         |> push_navigate(to: socket.assigns.navigate)}
     end
   end
 end
