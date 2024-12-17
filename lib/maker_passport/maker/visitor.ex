@@ -1,6 +1,7 @@
 defmodule MakerPassport.Maker.Visitor do
   use Ecto.Schema
   import Ecto.Changeset
+
   @hash_algorithm :sha256
   @rand_size 32
 
@@ -25,7 +26,7 @@ defmodule MakerPassport.Maker.Visitor do
     {Base.url_encode64(token, padding: false), hashed_token}
   end
 
-  def hash_decoded_token(token) do
+  def decode_token(token) do
     {:ok, decoded_token} = Base.url_decode64(token, padding: false)
     :crypto.hash(@hash_algorithm, decoded_token)
   end

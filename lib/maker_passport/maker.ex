@@ -177,7 +177,7 @@ defmodule MakerPassport.Maker do
 
   """
   def get_visitor_by_token(token) do
-    token = Visitor.hash_decoded_token(token)
+    token = Visitor.decode_token(token)
     Repo.get_by(Visitor, token: token)
   end
 
