@@ -164,25 +164,6 @@ defmodule MakerPassport.Maker do
     Profile.changeset(profile, attrs)
   end
 
-
-  @doc """
-  Creates a email.
-
-  ## Examples
-
-      iex> create_email(%{field: value})
-      {:ok, %Email{}}
-
-      iex> create_email(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def create_email(attrs \\ %{}) do
-    %Email{}
-    |> Email.changeset(attrs)
-    |> Repo.insert()
-  end
-
   @doc """
   Gets a visitor by token.
 
@@ -217,6 +198,33 @@ defmodule MakerPassport.Maker do
   end
 
   @doc """
+  Creates a verify visitor.
+
+  ## Examples
+
+      iex> create_and_verify_visitor(%{field: value})
+      {:ok, %Visitor{}}
+
+      iex> create_and_verify_visitor(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_and_verify_visitor(attrs \\ %{}) do
+    {encoded_token, hashed_token} = Visitor.generate_token()
+
+    visitor = %Visitor{}
+    |> Map.put(:token, hashed_token)
+    |> Visitor.changeset(attrs)
+    |> Repo.insert!()
+
+    url = MakerPassportWeb.Endpoint.url() <> "/verify-email?token=#{encoded_token}"
+
+    Accounts.UserNotifier.confirm_email(visitor, url)
+
+    {:ok, visitor}
+  end
+
+  @doc """
   Updates a visitor.
 
   ## Examples
@@ -232,35 +240,6 @@ defmodule MakerPassport.Maker do
     visitor
     |> Visitor.changeset(attrs)
     |> Repo.update()
-  end
-
-
-  @doc """
-  Creates a verify visitor.
-
-  ## Examples
-
-      iex> create_and_verify_visitor(%{field: value})
-      {:ok, %Visitor{}}
-
-      iex> create_and_verify_visitor(%{field: bad_value})
-      {:error, %Ecto.Changeset{}}
-
-  """
-  def create_and_verify_visitor(attrs \\ %{}) do
-    {encoded_token, hashed_token} = Visitor.generate_token()
-    IO.inspect(hashed_token)
-
-    visitor = %Visitor{}
-    |> Map.put(:token, hashed_token)
-    |> Visitor.changeset(attrs)
-    |> Repo.insert!()
-
-    url = MakerPassportWeb.Endpoint.url() <> "/verify-email?token=#{encoded_token}"
-
-    Accounts.UserNotifier.confirm_email(visitor, url)
-
-    {:ok, visitor}
   end
 
   @doc """
@@ -279,15 +258,31 @@ defmodule MakerPassport.Maker do
     {encoded_token, hashed_token} = Visitor.generate_token()
     attrs = Map.put(attrs, "token", hashed_token)
 
-    visitor = visitor
-    |> Visitor.changeset(attrs)
-    |> Repo.update!()
+    {:ok, visitor} = update_visitor(visitor, attrs)
 
     url = MakerPassportWeb.Endpoint.url() <> "/verify-email?token=#{encoded_token}"
 
     Accounts.UserNotifier.confirm_email(visitor, url)
 
     {:ok, visitor}
+  end
+
+   @doc """
+  Creates a email.
+
+  ## Examples
+
+      iex> create_email(%{field: value})
+      {:ok, %Email{}}
+
+      iex> create_email(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_email(attrs \\ %{}) do
+    %Email{}
+    |> Email.changeset(attrs)
+    |> Repo.insert()
   end
 
   @doc """
