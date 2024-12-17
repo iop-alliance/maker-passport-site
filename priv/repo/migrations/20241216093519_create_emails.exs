@@ -5,6 +5,7 @@ defmodule MakerPassport.Repo.Migrations.CreateEmails do
     create table(:emails) do
       add :subject, :string
       add :body, :text
+      add :status, :string
       add :visitor_id, references(:visitors)
       add :profile_id, references(:profiles)
 

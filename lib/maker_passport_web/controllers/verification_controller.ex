@@ -11,6 +11,7 @@ defmodule MakerPassportWeb.VerificationController do
       _ ->
         Maker.update_visitor(visitor, %{is_verified: true})
         emails = Maker.get_emails_by_visitor_id(visitor.id)
+        Maker.update_emails(emails, %{status: "sent"})
         emails |> Enum.each(fn email ->
           email_params = %{
             sender_email: visitor.email,

@@ -272,7 +272,7 @@ defmodule MakerPassport.Maker do
 
   """
   def update_and_verify_visitor(%Visitor{} = visitor, attrs) do
-    attrs = Map.put(attrs, :token, generate_token())
+    attrs = Map.put(attrs, "token", generate_token())
 
     visitor = visitor
     |> Visitor.changeset(attrs)
@@ -291,7 +291,17 @@ defmodule MakerPassport.Maker do
   end
 
   def get_emails_by_visitor_id(visitor_id) do
-    Repo.all(from e in Email, where: e.visitor_id == ^visitor_id) |> Repo.preload([profile: [:user]])
+    Repo.all(from e in Email, where: e.visitor_id == ^visitor_id and e.status == "pending")
+    |> Repo.preload([profile: [:user]])
+  end
+
+  def update_emails(emails, attrs) do
+    emails
+    |> Enum.each(fn email ->
+      email
+      |> Email.changeset(attrs)
+      |> Repo.update!()
+    end)
   end
 
   @doc """
