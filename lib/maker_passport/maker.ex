@@ -196,6 +196,7 @@ defmodule MakerPassport.Maker do
 
   """
   def get_visitor_by_token(token) do
+    token = Visitor.hash_decoded_token(token)
     Repo.get_by(Visitor, token: token)
   end
 
@@ -247,12 +248,15 @@ defmodule MakerPassport.Maker do
 
   """
   def create_and_verify_visitor(attrs \\ %{}) do
+    {encoded_token, hashed_token} = Visitor.generate_token()
+    IO.inspect(hashed_token)
+
     visitor = %Visitor{}
-    |> Map.put(:token, generate_token())
+    |> Map.put(:token, hashed_token)
     |> Visitor.changeset(attrs)
     |> Repo.insert!()
 
-    url = MakerPassportWeb.Endpoint.url() <> "/verify-email?token=#{visitor.token}"
+    url = MakerPassportWeb.Endpoint.url() <> "/verify-email?token=#{encoded_token}"
 
     Accounts.UserNotifier.confirm_email(visitor, url)
 
@@ -272,22 +276,18 @@ defmodule MakerPassport.Maker do
 
   """
   def update_and_verify_visitor(%Visitor{} = visitor, attrs) do
-    attrs = Map.put(attrs, "token", generate_token())
+    {encoded_token, hashed_token} = Visitor.generate_token()
+    attrs = Map.put(attrs, "token", hashed_token)
 
     visitor = visitor
     |> Visitor.changeset(attrs)
     |> Repo.update!()
 
-    url = MakerPassportWeb.Endpoint.url() <> "/verify-email?token=#{visitor.token}"
+    url = MakerPassportWeb.Endpoint.url() <> "/verify-email?token=#{encoded_token}"
 
     Accounts.UserNotifier.confirm_email(visitor, url)
 
     {:ok, visitor}
-  end
-
-  defp generate_token() do
-    token = :crypto.strong_rand_bytes(32)
-    Base.url_encode64(token, padding: false)
   end
 
   @doc """
