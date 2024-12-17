@@ -60,7 +60,7 @@ defmodule MakerPassportWeb.ProfileLive.EmailFormComponent do
         create_email(email_params, visitor, socket)
 
       %{is_verified: false} = visitor ->
-        {:ok, visitor} = Maker.update_and_verify_visitor(visitor, email_params)
+        {:ok, visitor} = Maker.update_and_verify_visitor(visitor, %{"name" => email_params["sender_name"]})
         create_email(email_params, visitor, socket)
 
       _visitor ->

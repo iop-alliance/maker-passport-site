@@ -290,11 +290,29 @@ defmodule MakerPassport.Maker do
     Base.url_encode64(token, padding: false)
   end
 
+  @doc """
+  Get emails by visitor id.
+
+  ## Examples
+
+      iex> get_emails_by_visitor_id(visitor_id)
+      [%Email{}, ...]
+
+  """
   def get_emails_by_visitor_id(visitor_id) do
     Repo.all(from e in Email, where: e.visitor_id == ^visitor_id and e.status == "pending")
     |> Repo.preload([profile: [:user]])
   end
 
+  @doc """
+  Update emails.
+
+  ## Examples
+
+      iex> update_emails(emails, %{status: "sent"})
+      {:ok, [%Email{}, ...]}
+
+  """
   def update_emails(emails, attrs) do
     emails
     |> Enum.each(fn email ->
