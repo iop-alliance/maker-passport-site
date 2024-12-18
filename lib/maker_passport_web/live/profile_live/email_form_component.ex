@@ -105,7 +105,7 @@ defmodule MakerPassportWeb.ProfileLive.EmailFormComponent do
          |> push_navigate(to: socket.assigns.navigate)}
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        {:noreply, assign(socket, :changeset, changeset)}
+        {:noreply, assign(socket, :email_form, to_form(changeset, action: :validate))}
     end
   end
 
