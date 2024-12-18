@@ -93,7 +93,6 @@ defmodule MakerPassportWeb.ProfileLive.EmailFormComponent do
   def create_email(email_params, visitor, socket) do
     email_params =
       Map.merge(email_params, %{
-        "status" => "pending",
         "visitor_id" => visitor.id,
         "profile_id" => socket.assigns.profile.id
       })

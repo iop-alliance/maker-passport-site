@@ -294,27 +294,9 @@ defmodule MakerPassport.Maker do
       [%Email{}, ...]
 
   """
-  def get_emails_by_visitor_id(visitor_id) do
-    Repo.all(from e in Email, where: e.visitor_id == ^visitor_id and e.status == "pending")
+  def list_emails_of_a_visitor(visitor_id) do
+    Repo.all(from e in Email, where: e.visitor_id == ^visitor_id)
     |> Repo.preload([profile: [:user]])
-  end
-
-  @doc """
-  Update emails.
-
-  ## Examples
-
-      iex> update_emails(emails, %{status: "sent"})
-      {:ok, [%Email{}, ...]}
-
-  """
-  def update_emails(emails, attrs) do
-    emails
-    |> Enum.each(fn email ->
-      email
-      |> Email.changeset(attrs)
-      |> Repo.update!()
-    end)
   end
 
   @doc """

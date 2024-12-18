@@ -8,10 +8,11 @@ defmodule MakerPassportWeb.VerificationController do
     case visitor do
       nil ->
         render(conn, :token_expired, layout: false)
+      %{is_verified: true} ->
+        render(conn, :verified, layout: false)
       _ ->
         Maker.update_visitor(visitor, %{is_verified: true})
-        emails = Maker.get_emails_by_visitor_id(visitor.id)
-        Maker.update_emails(emails, %{status: "sent"})
+        emails = Maker.list_emails_of_a_visitor(visitor.id)
         emails |> Enum.each(fn email ->
           email_params = %{
             sender_email: visitor.email,
@@ -21,7 +22,6 @@ defmodule MakerPassportWeb.VerificationController do
           }
           UserNotifier.send_email_to_maker(email_params)
         end)
-
         render(conn, :verified, layout: false)
     end
   end
