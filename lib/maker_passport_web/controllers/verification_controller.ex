@@ -2,17 +2,18 @@ defmodule MakerPassportWeb.VerificationController do
   use MakerPassportWeb, :controller
 
   alias MakerPassport.Accounts.UserNotifier
-  alias MakerPassport.Maker
+  alias MakerPassport.Visitor
+
   def verify_email(conn, %{"token" => token}) do
-    visitor = Maker.get_visitor_by_token(token)
+    visitor = Visitor.get_visitor_by_token(token)
     case visitor do
       nil ->
         render(conn, :token_expired, layout: false)
       %{is_verified: true} ->
         render(conn, :verified, layout: false)
       _ ->
-        Maker.update_visitor(visitor, %{is_verified: true})
-        emails = Maker.list_emails_of_a_visitor(visitor.id)
+        Visitor.update_visitor(visitor, %{is_verified: true})
+        emails = Visitor.list_emails_of_a_visitor(visitor.id)
         emails |> Enum.each(fn email ->
           email_params = %{
             sender_email: visitor.email,

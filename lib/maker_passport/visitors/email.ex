@@ -1,4 +1,4 @@
-defmodule MakerPassport.Maker.Email do
+defmodule MakerPassport.Visitors.Email do
   @moduledoc """
   A Maker's profile location.
   """
@@ -10,7 +10,7 @@ defmodule MakerPassport.Maker.Email do
     field :subject, :string
     field :body, :string
     belongs_to :profile, MakerPassport.Maker.Profile
-    belongs_to :visitor, MakerPassport.Maker.Visitor
+    belongs_to :visitor, MakerPassport.Visitors.Visitor
 
     timestamps(type: :utc_datetime)
   end

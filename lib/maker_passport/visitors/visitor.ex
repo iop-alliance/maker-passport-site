@@ -1,4 +1,4 @@
-defmodule MakerPassport.Maker.Visitor do
+defmodule MakerPassport.Visitors.Visitor do
   use Ecto.Schema
   import Ecto.Changeset
 

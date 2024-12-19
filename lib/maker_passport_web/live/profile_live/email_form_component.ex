@@ -1,8 +1,9 @@
 defmodule MakerPassportWeb.ProfileLive.EmailFormComponent do
+
   use MakerPassportWeb, :live_component
 
-  alias MakerPassport.Maker.Email
-  alias MakerPassport.Maker
+  alias MakerPassport.Visitors.Email
+  alias MakerPassport.Visitor
   alias MakerPassport.Accounts.UserNotifier
 
   @impl true
@@ -53,14 +54,14 @@ defmodule MakerPassportWeb.ProfileLive.EmailFormComponent do
   end
 
   def handle_event("save", %{"email" => email_params}, %{assigns: %{current_user: nil}} = socket) do
-    case Maker.get_visitor_by_email(email_params["sender_email"]) do
+    case Visitor.get_visitor_by_email(email_params["sender_email"]) do
       nil ->
         visitor_params = %{email: email_params["sender_email"], name: email_params["sender_name"]}
-        {:ok, visitor} = Maker.create_and_verify_visitor(visitor_params)
+        {:ok, visitor} = Visitor.create_and_verify_visitor(visitor_params)
         create_email(email_params, visitor, socket)
 
       %{is_verified: false} = visitor ->
-        {:ok, visitor} = Maker.update_and_verify_visitor(visitor, %{"name" => email_params["sender_name"]})
+        {:ok, visitor} = Visitor.update_and_verify_visitor(visitor, %{"name" => email_params["sender_name"]})
         create_email(email_params, visitor, socket)
 
       _visitor ->
@@ -97,7 +98,7 @@ defmodule MakerPassportWeb.ProfileLive.EmailFormComponent do
         "profile_id" => socket.assigns.profile.id
       })
 
-    case Maker.create_email(email_params) do
+    case Visitor.create_email(email_params) do
       {:ok, _email} ->
         {:noreply,
          socket
