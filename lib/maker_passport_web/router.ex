@@ -2,6 +2,9 @@ defmodule MakerPassportWeb.Router do
   use MakerPassportWeb, :router
 
   import MakerPassportWeb.UserAuth
+  @env Application.compile_env(:maker_passport, :env)
+
+  if @env == :dev, do: forward("/mailbox", Plug.Swoosh.MailboxPreview)
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -24,6 +27,7 @@ defmodule MakerPassportWeb.Router do
     live "/profiles", ProfileLive.Index
 
     get "/about", PageController, :about
+    get "/verify-email", VerificationController, :verify_email
   end
 
   # Other scopes may use custom stacks.
@@ -92,6 +96,7 @@ defmodule MakerPassportWeb.Router do
       live "/users/confirm/:token", UserConfirmationLive, :edit
       live "/users/confirm", UserConfirmationInstructionsLive, :new
 
+      live "/profiles/:id/contact", ProfileLive.Show, :contact
       live "/profiles/:id", ProfileLive.Show, :show
     end
   end
