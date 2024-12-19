@@ -23,6 +23,8 @@ defmodule MakerPassport.Maker do
     Profile
     |> join(:left, [p], s in assoc(p, :skills))
     |> join(:left, [p], l in assoc(p, :location))
+    |> join(:left, [p], u in assoc(p, :user))
+    |> where([p, ..., u], not is_nil(u.confirmed_at))
     |> maybe_filter_by_country(filter_params)
     |> maybe_filter_by_city(filter_params)
     |> maybe_filter_by_skills(filter_params)
@@ -60,6 +62,8 @@ defmodule MakerPassport.Maker do
     |> where([p], not is_nil(p.name))
     |> join(:left, [p], s in assoc(p, :skills))
     |> join(:left, [p], l in assoc(p, :location))
+    |> join(:left, [p], u in assoc(p, :user))
+    |> where([p, ..., u], not is_nil(u.confirmed_at))
     |> maybe_filter_by_country(filter_params)
     |> maybe_filter_by_city(filter_params)
     |> maybe_filter_by_skills(filter_params)
@@ -74,6 +78,9 @@ defmodule MakerPassport.Maker do
 
       {:preload, preload}, query ->
         from q in query, preload: ^preload
+
+      {:current_id, current_id}, query ->
+        from q in query, where: q.id != ^current_id
     end)
     |> Repo.all()
     |> Repo.preload([:user, :skills])
