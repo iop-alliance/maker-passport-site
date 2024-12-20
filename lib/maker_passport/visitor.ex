@@ -1,5 +1,4 @@
 defmodule MakerPassport.Visitor do
-
   import Ecto.Query, warn: false
   alias MakerPassport.Accounts
   alias MakerPassport.Repo
@@ -36,7 +35,14 @@ defmodule MakerPassport.Visitor do
   """
   def get_visitor_by_token(token) do
     token = Visitor.decode_token(token)
-    Repo.get_by(Visitor, token: token)
+
+    Repo.one(
+      from v in Visitor,
+        where:
+          v.token == ^token and
+            v.updated_at >= ^NaiveDateTime.add(NaiveDateTime.utc_now(), -7 * 24 * 60 * 60),
+        select: v
+    )
   end
 
   @doc """
@@ -70,10 +76,11 @@ defmodule MakerPassport.Visitor do
   def create_and_verify_visitor(attrs \\ %{}) do
     {encoded_token, hashed_token} = Visitor.generate_token()
 
-    visitor = %Visitor{}
-    |> Map.put(:token, hashed_token)
-    |> Visitor.changeset(attrs)
-    |> Repo.insert!()
+    visitor =
+      %Visitor{}
+      |> Map.put(:token, hashed_token)
+      |> Visitor.changeset(attrs)
+      |> Repo.insert!()
 
     url = MakerPassportWeb.Endpoint.url() <> "/verify-email?token=#{encoded_token}"
 
@@ -169,7 +176,7 @@ defmodule MakerPassport.Visitor do
   """
   def list_emails_of_a_visitor(visitor_id) do
     Repo.all(from e in Email, where: e.visitor_id == ^visitor_id)
-    |> Repo.preload([profile: [:user]])
+    |> Repo.preload(profile: [:user])
   end
 
   @doc """
