@@ -171,4 +171,17 @@ defmodule MakerPassport.Visitor do
     Repo.all(from e in Email, where: e.visitor_id == ^visitor_id)
     |> Repo.preload([profile: [:user]])
   end
+
+  @doc """
+  Delete emails by visitor id.
+
+  ## Examples
+
+      iex> delete_emails_of_a_visitor(visitor_id)
+      [%Email{}, ...]
+
+  """
+  def delete_emails_of_a_visitor(visitor_id) do
+    Repo.delete_all(from e in Email, where: e.visitor_id == ^visitor_id)
+  end
 end

@@ -14,6 +14,7 @@ defmodule MakerPassportWeb.VerificationController do
       _ ->
         Visitor.update_visitor(visitor, %{is_verified: true})
         emails = Visitor.list_emails_of_a_visitor(visitor.id)
+        Visitor.delete_emails_of_a_visitor(visitor.id)
         emails |> Enum.each(fn email ->
           email_params = %{
             sender_email: visitor.email,
