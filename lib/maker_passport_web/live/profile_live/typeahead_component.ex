@@ -45,6 +45,9 @@ defmodule MakerPassportWeb.ProfileLive.TypeaheadComponent do
         data-focused-option={@focused_option}
         class="max-h-60 py-2 overflow-y-auto text-gray-700 dark:text-gray-200"
         role="listbox">
+        <li :if={length(@search_options) == 0} class="px-4 py-2 text-gray-500">
+          No options found
+        </li>
         <li
           :for={{{label, value}, idx} <- @search_options |> Enum.with_index(0)}
           id={"#{@id}-#{idx}"}
