@@ -1,5 +1,5 @@
 <div class="container mx-auto px-4 py-8">
-  <h2 class="text-2xl font-bold text-gray-800 text-center mb-6">Pending Email Verification</h2>
+  <h2 class="text-2xl font-bold text-gray-800 text-center mb-6">Visitors</h2>
   <div class="bg-white rounded-lg shadow-md">
     <table class="min-w-full divide-y divide-gray-200">
       <thead class="bg-white">
@@ -9,27 +9,31 @@
         </tr>
       </thead>
       <tbody class="bg-white divide-y divide-gray-200">
-        <%= if length(@pending_visitors) == 0 do %>
+        <%= if length(@visitors) == 0 do %>
           <tr>
             <td colspan="2" class="px-6 py-4 text-center text-sm text-gray-700">
-              No pending verifications
+              No visitors
             </td>
           </tr>
         <% else %>
-          <%= for visitor <- @pending_visitors do %>
+          <%= for visitor <- @visitors do %>
             <tr id={"visitor-#{visitor.id}"} class="hover:bg-gray-50 transition-colors duration-200">
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                 <%= visitor.email %>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-right relative">
-                <div class="tooltip" data-tip="Send verification email">
-                  <button 
-                    phx-click="send-verification-email"
-                    phx-value-visitor_id={visitor.id}
-                    class="inline-flex items-center text-gray-400 hover:text-blue-500 transition-colors duration-200"
-                  >
-                    Verify Email
-                  </button>
+                <div class="tooltip" data-tip={if visitor.is_verified, do: "Verified", else: "Send verification email"}>
+                  <%= if !visitor.is_verified do %>
+                    <button 
+                      phx-click="send-verification-email"
+                      phx-value-visitor_id={visitor.id}
+                      class="inline-flex items-center text-gray-400 hover:text-blue-500 transition-colors duration-200"
+                    >
+                      Verify Email
+                    </button>
+                  <% else %>
+                    <span class="text-green-500">Verified</span>
+                  <% end %>
                 </div>
               </td>
             </tr>

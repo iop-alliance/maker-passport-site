@@ -10,11 +10,11 @@ defmodule MakerPassportWeb.Admin.VisitorLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    pending_visitors = Visitor.list_unverified_visitors()
+    visitors = Visitor.list_visitors()
 
     socket =
       socket
-      |> assign(pending_visitors: pending_visitors)
+      |> assign(visitors: visitors)
 
     {:ok, socket}
   end

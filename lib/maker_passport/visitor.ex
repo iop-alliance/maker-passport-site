@@ -134,9 +134,9 @@ defmodule MakerPassport.Visitor do
       [%Visitor{}, ...]
 
   """
-  def list_unverified_visitors() do
+  def list_visitors() do
     Visitor
-    |> where([v], v.is_verified == false)
+    |> order_by([v], asc: v.is_verified)
     |> Repo.all()
   end
 
