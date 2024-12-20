@@ -104,15 +104,6 @@ defmodule MakerPassportWeb.ProfileLive.ProfileFormComponent do
     |> Enum.sort_by(fn {name, _code} -> name end)
   end
 
-  def get_country_name(%{country: country_code}) do
-    case Countries.get(country_code) do
-      nil -> "Unknown"
-      country -> {country.name, country_code}
-    end
-  end
-
-  def get_country_name(_), do: ""
-
   defp presign_upload(entry, socket) do
     config = %{
       region: @do_region,

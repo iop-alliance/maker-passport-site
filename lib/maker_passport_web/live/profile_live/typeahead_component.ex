@@ -45,6 +45,9 @@ defmodule MakerPassportWeb.ProfileLive.TypeaheadComponent do
         data-focused-option={@focused_option}
         class="max-h-60 py-2 overflow-y-auto text-gray-700 dark:text-gray-200"
         role="listbox">
+        <li :if={length(@search_options) == 0} class="px-4 py-2 text-gray-500">
+          No options found
+        </li>
         <li
           :for={{{label, value}, idx} <- @search_options |> Enum.with_index(0)}
           id={"#{@id}-#{idx}"}
@@ -70,9 +73,7 @@ defmodule MakerPassportWeb.ProfileLive.TypeaheadComponent do
     ~H"""
     <div class="space-y-1">
       <.label :if={@label} for={@id}><%= @label %></.label>
-      <div class=""
-        phx-click-away="hide-options"
-        phx-target={@myself}>
+      <div class="relative" phx-click-away="hide-options" phx-target={@myself}>
         <input
           type="text"
           name={@name}
@@ -83,7 +84,8 @@ defmodule MakerPassportWeb.ProfileLive.TypeaheadComponent do
             "block text-grey-700 focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 phx-no-feedback:border-gray-300",
             "phx-no-feedback:focus:border-blue-500 phx-no-feedback:focus:ring-blue-500/5",
             "phx-no-feedback:dark:border-gray-600 phx-no-feedback:dark:focus:border-blue-500 phx-no-feedback:dark:focus:ring-blue-500/5",
-            "#{@class}"
+            "#{@class}",
+            @disabled && "bg-gray-200 cursor-not-allowed"
           ]}
           role="combobox"
           phx-keydown="set-focus"

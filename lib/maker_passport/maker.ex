@@ -18,30 +18,56 @@ defmodule MakerPassport.Maker do
       [%Profile{}, ...]
 
   """
-  def list_profiles(skills \\ []) do
-    Repo.all(Profile) |> Repo.preload([:skills, :user])
-
+  def list_profiles(filter_params \\ %{}) do
     query =
-      Profile
-      |> join(:left, [p], s in assoc(p, :skills))
-      |> maybe_filter_by_skills(skills)
-      |> preload([:skills, :user])
-      |> distinct([p], p.id)
+    Profile
+    |> join(:left, [p], s in assoc(p, :skills))
+    |> join(:left, [p], l in assoc(p, :location))
+    |> join(:left, [p], u in assoc(p, :user))
+    |> where([p, ..., u], not is_nil(u.confirmed_at))
+    |> maybe_filter_by_country(filter_params)
+    |> maybe_filter_by_city(filter_params)
+    |> maybe_filter_by_skills(filter_params)
+    |> preload([:skills, :user])
+    |> distinct([p], p.id)
 
     Repo.all(query)
   end
 
-  defp maybe_filter_by_skills(query, []), do: query
-
-  defp maybe_filter_by_skills(query, skills) do
+  defp maybe_filter_by_skills(query, %{search_skills: skills}) when skills != [], do:
     query
     |> where([p, s], s.name in ^skills)
     |> group_by([p], p.id)
     |> having([p, s], count(s.id) == ^length(skills))
+
+  defp maybe_filter_by_skills(query, _), do: query
+
+  def maybe_filter_by_city(query, %{city_search: city}) when city != "" do
+    query
+    |> where([p, s, l], ilike(l.city, ^"%#{city}%"))
   end
 
-  def list_profiles_by_criteria(criteria) when is_list(criteria) do
-    query = from(p in Profile, where: not is_nil(p.name))
+  def maybe_filter_by_city(query, _), do: query
+
+  def maybe_filter_by_country(query, %{country_search: country}) when country != "" do
+    query
+    |> where([p, s, l], ilike(l.country, ^"%#{country}%"))
+  end
+
+  def maybe_filter_by_country(query, _), do: query
+
+
+  def list_profiles_by_criteria(criteria, filter_params \\ %{}) when is_list(criteria) do
+    query = Profile
+    |> where([p], not is_nil(p.name))
+    |> join(:left, [p], s in assoc(p, :skills))
+    |> join(:left, [p], l in assoc(p, :location))
+    |> join(:left, [p], u in assoc(p, :user))
+    |> where([p, ..., u], not is_nil(u.confirmed_at))
+    |> maybe_filter_by_country(filter_params)
+    |> maybe_filter_by_city(filter_params)
+    |> maybe_filter_by_skills(filter_params)
+    |> distinct([p], p.id)
 
     Enum.reduce(criteria, query, fn
       {:sort, %{sort_by: sort_by, sort_order: sort_order}}, query ->
@@ -52,6 +78,9 @@ defmodule MakerPassport.Maker do
 
       {:preload, preload}, query ->
         from q in query, preload: ^preload
+
+      {:current_id, current_id}, query ->
+        from q in query, where: q.id != ^current_id
     end)
     |> Repo.all()
     |> Repo.preload([:user, :skills])
@@ -346,7 +375,15 @@ defmodule MakerPassport.Maker do
     Repo.all(from l in Location, where: ilike(l.city, ^"%#{search_text}%"))
   end
 
-  def to_city_list(cities, nil) do
+  def search_cities("", _), do: []
+
+  def search_cities(search_text, country) do
+    Repo.all(from l in Location, where: ilike(l.city, ^"%#{search_text}%") and l.country == ^country)
+  end
+
+  def to_city_list(cities, selected_city) when is_binary(selected_city) do
+    cities = Enum.filter(cities, &(&1.city != selected_city))
+
     cities
     |> Enum.map(&to_city_tuple/1)
     |> Enum.sort_by(&elem(&1, 0))
@@ -362,6 +399,31 @@ defmodule MakerPassport.Maker do
 
   defp to_city_tuple(location) do
     {location.city, location.id}
+  end
+
+  def search_countries(""), do: []
+
+  def search_countries(search_text) do
+    Repo.all(from c in Location, where: ilike(c.country, ^"%#{search_text}%"), distinct: c.country)
+  end
+
+  def to_country_list(countries, selected_country) do
+    countries = Enum.filter(countries, &(&1.country != selected_country))
+
+    countries
+    |> Enum.map(&to_country_tuple/1)
+    |> Enum.sort_by(&elem(&1, 0))
+  end
+
+  defp to_country_tuple(location) do
+    {get_country_name(location.country), location.country}
+  end
+
+  def get_country_name(country_code) do
+    case Countries.get(country_code) do
+      nil -> "Unknown"
+      country -> country.name
+    end
   end
 
   @doc """

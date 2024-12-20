@@ -20,7 +20,7 @@
         phx-target={@myself} 
         allow_clear={true}
         id="country_search" 
-        value={@form[:country].value || get_country_name(@profile.location)} 
+        value={@form[:country].value || (@profile.location && Maker.get_country_name(@profile.location.country))} 
       />    
     </div>
     
