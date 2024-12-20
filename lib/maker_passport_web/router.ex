@@ -68,6 +68,19 @@ defmodule MakerPassportWeb.Router do
     post "/users/log_in", UserSessionController, :create
   end
 
+  # Separate admin routes
+  scope "/admin", MakerPassportWeb.Admin do
+    pipe_through [:browser, :require_authenticated_user]
+
+    live_session :admin_user,
+      on_mount: [
+        {MakerPassportWeb.UserAuth, :ensure_authenticated},
+        {Permit.Phoenix.LiveView.AuthorizeHook, []}
+      ] do
+      live "/visitors", VisitorLive.Index, :index
+    end
+  end
+
   scope "/", MakerPassportWeb do
     pipe_through [:browser, :require_authenticated_user]
 
