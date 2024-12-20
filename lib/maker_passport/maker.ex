@@ -362,6 +362,13 @@ defmodule MakerPassport.Maker do
     {location.city, location.id}
   end
 
+  def get_country_name(country_code) do
+    case Countries.get(country_code) do
+      nil -> "Unknown"
+      country -> country.name
+    end
+  end
+
   @doc """
   Gets a single website.
 

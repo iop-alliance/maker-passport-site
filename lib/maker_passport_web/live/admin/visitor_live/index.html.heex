@@ -23,17 +23,15 @@
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-right relative">
                 <div class="tooltip" data-tip={if visitor.is_verified, do: "Verified", else: "Send verification email"}>
-                  <%= if !visitor.is_verified do %>
                     <button 
+                      :if={!visitor.is_verified}
                       phx-click="send-verification-email"
                       phx-value-visitor_id={visitor.id}
                       class="inline-flex items-center text-gray-400 hover:text-blue-500 transition-colors duration-200"
                     >
                       Verify Email
                     </button>
-                  <% else %>
-                    <span class="text-green-500">Verified</span>
-                  <% end %>
+                    <span :if={visitor.is_verified} class="text-green-500">Verified</span>
                 </div>
               </td>
             </tr>

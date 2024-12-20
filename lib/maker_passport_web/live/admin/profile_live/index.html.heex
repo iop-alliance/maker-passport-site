@@ -27,7 +27,7 @@
                 <%= profile.user.email %>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                <%= profile.location && profile.location.country %>
+                <%= profile.location && Maker.get_country_name(profile.location.country) %>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                 <%= profile.location && profile.location.city %>
