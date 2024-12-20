@@ -25,6 +25,7 @@ defmodule MakerPassportWeb.ProfileLive.Index do
       |> assign(:filter_params, %{search_skills: [], country_search: "", city_search: ""})
       |> assign(:no_skills_results, false)
       |> assign(:profile, nil)
+      |> assign(:form, to_form(%{}, as: "filter_params"))
       |> stream(:profiles, profiles)
 
     {:ok, socket}
