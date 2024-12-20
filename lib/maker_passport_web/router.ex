@@ -78,6 +78,7 @@ defmodule MakerPassportWeb.Router do
         {Permit.Phoenix.LiveView.AuthorizeHook, []}
       ] do
       live "/visitors", VisitorLive.Index, :index
+      live "/profiles", ProfileLive.Index, :index
     end
   end
 

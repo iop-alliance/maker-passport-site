@@ -7,6 +7,7 @@ defmodule MakerPassport.Permissions do
   def can(%{role: "admin"}) do
     permit()
     |> all(MakerPassport.Visitors.Visitor)
+    |> all(MakerPassport.Profile)
   end
 
   def can(_), do: permit()

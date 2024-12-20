@@ -1,0 +1,41 @@
+<div class="container mx-auto px-4 py-8">
+  <h2 class="text-2xl font-bold text-gray-800 text-center mb-6">Maker Profiles</h2>
+  <div class="bg-white rounded-lg shadow-md">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-white">
+        <tr>
+          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Name</th>
+          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Email</th>
+          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-700">Country</th>
+          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-700">City</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <%= if length(@profiles) == 0 do %>
+          <tr>
+            <td colspan="2" class="px-6 py-4 text-center text-sm text-gray-700">
+              No profiles
+            </td>
+          </tr>
+        <% else %>
+          <%= for profile <- @profiles do %>
+            <tr id={"profile-#{profile.id}"} class="hover:bg-gray-50 transition-colors duration-200">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                <%= profile.name %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                <%= profile.user.email %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                <%= profile.location && profile.location.country %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                <%= profile.location && profile.location.city %>
+              </td>
+            </tr>
+          <% end %>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
