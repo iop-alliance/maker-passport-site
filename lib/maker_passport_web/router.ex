@@ -27,7 +27,7 @@ defmodule MakerPassportWeb.Router do
     live "/profiles", ProfileLive.Index
 
     get "/about", PageController, :about
-    get "/verify-email", VerificationController, :verify_email
+    live "/verify-email", VisitorLive, :index
   end
 
   # Other scopes may use custom stacks.
