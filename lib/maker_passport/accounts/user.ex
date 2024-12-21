@@ -10,6 +10,7 @@ defmodule MakerPassport.Accounts.User do
 
   schema "users" do
     field :email, :string
+    field :role, :string, default: "user"
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :current_password, :string, virtual: true, redact: true
@@ -45,7 +46,7 @@ defmodule MakerPassport.Accounts.User do
   """
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :password])
+    |> cast(attrs, [:email, :password, :role])
     |> validate_email(opts)
     |> validate_password(opts)
     |> cast_assoc(:profile)

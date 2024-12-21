@@ -19,13 +19,11 @@ defmodule MakerPassport.Maker do
 
   """
   def list_profiles(skills \\ []) do
-    Repo.all(Profile) |> Repo.preload([:skills, :user])
-
     query =
       Profile
       |> join(:left, [p], s in assoc(p, :skills))
       |> maybe_filter_by_skills(skills)
-      |> preload([:skills, :user])
+      |> preload([:skills, :user, :location])
       |> distinct([p], p.id)
 
     Repo.all(query)
@@ -362,6 +360,13 @@ defmodule MakerPassport.Maker do
 
   defp to_city_tuple(location) do
     {location.city, location.id}
+  end
+
+  def get_country_name(country_code) do
+    case Countries.get(country_code) do
+      nil -> "Unknown"
+      country -> country.name
+    end
   end
 
   @doc """
